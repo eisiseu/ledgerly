@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ledgerly — 프리랜서 재무 관리</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        "on-primary-fixed":"#000c1e","tertiary":"#525e55","error-container":"#fb5151",
+        "tertiary-fixed-dim":"#d9e6da","on-background":"#2d2f2f","on-tertiary":"#e9f6ea",
+        "inverse-surface":"#0c0f0f","surface-container":"#e7e8e8","tertiary-container":"#e7f4e8",
+        "outline-variant":"#acadad","surface-bright":"#f6f6f6","primary-dim":"#005192",
+        "primary-container":"#68abff","surface":"#f6f6f6","tertiary-dim":"#47524a",
+        "secondary-dim":"#43525a","inverse-primary":"#68abff",
+        "on-tertiary-fixed-variant":"#5b675e","surface-container-low":"#f0f1f1",
+        "tertiary-fixed":"#e7f4e8","outline":"#757777","surface-container-lowest":"#ffffff",
+        "primary-fixed":"#68abff","surface-variant":"#dbdddd","secondary-fixed-dim":"#c8d6e1",
+        "secondary":"#4f5d67","on-error":"#ffefee","on-surface-variant":"#5a5c5c",
+        "secondary-fixed":"#d6e5ef","on-error-container":"#570008","on-surface":"#2d2f2f",
+        "on-secondary-fixed":"#33414a","on-secondary-fixed-variant":"#4f5d67",
+        "on-primary":"#eef3ff","surface-dim":"#d2d5d5","on-primary-container":"#002b52",
+        "on-primary-fixed-variant":"#003461","primary":"#005da7",
+        "surface-container-high":"#e1e3e3","inverse-on-surface":"#9c9d9d",
+        "on-secondary":"#e7f5ff","secondary-container":"#d6e5ef","surface-tint":"#005da7",
+        "surface-container-highest":"#dbdddd","on-tertiary-fixed":"#3f4b42",
+        "on-tertiary-container":"#515d54","background":"#f6f6f6","error-dim":"#9f0519",
+        "primary-fixed-dim":"#599ef1","on-secondary-container":"#46545d","error":"#b31b25"
+      },
+      fontFamily: {
+        "headline":["Pretendard","sans-serif"],
+        "body":["Pretendard","sans-serif"],
+        "label":["Pretendard","sans-serif"]
+      },
+      borderRadius: {"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
+    },
+  },
+}
+</script>
+<style>
+body { font-family: 'Pretendard', sans-serif; -webkit-font-smoothing: antialiased; }
+header { -webkit-app-region: drag; }
+button, a, input, select, textarea, label, div[onclick], .nav-link, .toggle-switch { -webkit-app-region: no-drag; }
+.glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.icon-filled { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.text-display-lg { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+.text-headline-md { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.01em; }
+.text-title-lg { font-size: 1.375rem; font-weight: 600; }
+.text-label-md { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+.modal-overlay { background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); }
+.slide-in { animation: slideIn 0.2s ease-out; }
+@keyframes slideIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.15s ease-out; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+input[type="range"] { -webkit-appearance: none; height: 6px; border-radius: 3px; background: #e7e8e8; outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #005da7; cursor: pointer; box-shadow: 0 2px 6px rgba(0,93,167,0.3); }
+.toggle-switch { position: relative; width: 44px; height: 24px; background: #acadad; border-radius: 12px; cursor: pointer; transition: background 0.2s; }
+.toggle-switch.active { background: #005da7; }
+.toggle-switch::after { content:''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+.toggle-switch.active::after { transform: translateX(20px); }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #acadad; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #757777; }
+.pill-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill-opt { padding: 5px 14px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background: #e7e8e8; color: #5a5c5c; cursor: pointer; transition: all 0.15s; border: none; white-space: nowrap; }
+.pill-opt.sel-blue { background: #005da7; color: #eef3ff; }
+.pill-opt.sel-green { background: #525e55; color: #e9f6ea; }
+.pill-opt.sel-warn { background: #b31b25; color: #ffefee; }
+.pill-opt.sel-gray { background: #5a5c5c; color: #fff; }
+.date-icon-wrap { position: relative; display: flex; align-items: center; }
+.date-icon-wrap .material-symbols-outlined { position: absolute; left: 12px; font-size: 18px; color: #acadad; pointer-events: none; }
+.date-icon-wrap input[type="date"] { padding-left: 36px; }
+input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.4; cursor: pointer; }
+.tx-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 0.65rem; font-weight: 600; }
+.cal-trigger { cursor: pointer; transition: background 0.15s; user-select: none; }
+.cal-trigger:hover { background: #e1e3e3 !important; }
+#custom-calendar { font-family: 'Pretendard', sans-serif; }
+.cal-header-cell { width: 32px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 600; color: #5a5c5c; }
+.cal-header-cell.sun { color: #b31b25; }
+.cal-header-cell.sat { color: #4f5d67; }
+.cal-day { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.78rem; cursor: pointer; transition: background 0.1s; border: none; background: none; }
+.cal-day:hover:not(.cal-day-selected) { background: #e7e8e8; }
+.cal-day-selected { background: #005da7 !important; color: #eef3ff !important; font-weight: 700; }
+.cal-day-today:not(.cal-day-selected) { outline: 2px solid #005da7; outline-offset: -2px; font-weight: 600; color: #005da7; }
+.cal-day-other { color: #c0c2c2; }
+.cal-day-other:hover { background: #f0f1f1; }
+.toast-item { animation: toastIn 0.2s ease-out; }
+@keyframes toastIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body class="bg-surface text-on-surface overflow-hidden h-screen flex">
+
+<!-- ==================== SIDEBAR ==================== -->
+<aside id="sidebar" class="h-screen w-72 flex-col fixed left-0 top-0 flex py-8 space-y-2 bg-white text-sm z-50">
+  <div class="px-8 mb-10 mt-4">
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900">레저리</h1>
+    <p class="text-xs text-slate-400 mt-1">프리랜서 도우미</p>
+  </div>
+  <nav class="flex-1 space-y-1" id="nav-links">
+    <button data-view="dashboard" onclick="navigate('dashboard')" class="nav-link rounded-full px-4 py-3 mx-4 transition-all flex items-center space-x-3 cursor-pointer w-[calc(100%-2rem)] text-left">
+      <span class="material-symbols-outlined">dashboard</span><span>대시보드</span>
+    </button>
+    <button data-view="income" onclick="navigate('income')" class="nav-link rounded-full px-4 py-3 mx-4 transition-all flex items-center space-x-3 cursor-pointer w-[calc(100%-2rem)] text-left">
+      <span class="material-symbols-outlined">payments</span><span>수입/지출</span>
+    </button>
+    <button data-view="tax" onclick="navigate('tax')" class="nav-link rounded-full px-4 py-3 mx-4 transition-all flex items-center space-x-3 cursor-pointer w-[calc(100%-2rem)] text-left">
+      <span class="material-symbols-outlined">calculate</span><span>세금 계산기</span>
+    </button>
+    <button data-view="reports" onclick="navigate('reports')" class="nav-link rounded-full px-4 py-3 mx-4 transition-all flex items-center space-x-3 cursor-pointer w-[calc(100%-2rem)] text-left">
+      <span class="material-symbols-outlined">assessment</span><span>리포트</span>
+    </button>
+  </nav>
+  <div class="px-8 mt-auto pt-8">
+    <button onclick="openSettings()" class="flex items-center space-x-3 p-3 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors w-full text-left">
+      <span class="material-symbols-outlined text-on-surface-variant">settings</span>
+      <div class="flex flex-col">
+        <span class="text-xs font-semibold">설정</span>
+        <span class="text-[10px] text-on-surface-variant">프리랜서 모드</span>
+      </div>
+    </button>
+  </div>
+</aside>
+
+<!-- ==================== TOP HEADER ==================== -->
+<header class="fixed top-0 right-0 left-72 h-24 flex items-center justify-between px-10 bg-white/70 backdrop-blur-xl z-40">
+  <h2 id="page-title" class="text-title-lg text-on-surface"></h2>
+  <div class="flex items-center space-x-4">
+    <span class="text-sm text-on-surface-variant" id="header-year"></span>
+  </div>
+</header>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="ml-72 mt-24 flex-1 overflow-y-auto" style="height: calc(100vh - 6rem);">
+  <div id="view-container" class="px-10 pt-14 pb-10 space-y-12"></div>
+</main>
+
+<!-- ==================== MODAL OVERLAY ==================== -->
+<div id="modal-overlay" class="fixed inset-0 z-[100] hidden modal-overlay items-center justify-center">
+  <div class="relative max-w-lg w-full mx-4 slide-in">
+    <div id="modal-content" class="bg-white rounded-lg p-8 max-h-[80vh] overflow-y-auto shadow-2xl"></div>
+    <div id="modal-fade-top" class="pointer-events-none absolute inset-x-0 top-0 h-14 rounded-t-lg bg-gradient-to-b from-white to-transparent z-10" style="opacity:0;transition:opacity 0.2s"></div>
+    <div id="modal-fade-bot" class="pointer-events-none absolute inset-x-0 bottom-0 h-14 rounded-b-lg bg-gradient-to-t from-white to-transparent z-10" style="opacity:0;transition:opacity 0.2s"></div>
+  </div>
+</div>
+
+<!-- Custom Calendar -->
+<div id="custom-calendar" class="fixed z-[300] bg-white rounded-2xl shadow-2xl hidden" style="width:280px">
+  <div class="p-4">
+    <div class="flex items-center justify-between mb-3">
+      <button type="button" id="cal-month-label" onclick="datePicker.togglePicker()" class="text-sm font-bold text-on-surface hover:text-primary transition-colors cursor-pointer px-2 py-0.5 -ml-1 rounded-lg hover:bg-surface-container-low"></button>
+      <div class="flex gap-0.5">
+        <button type="button" onclick="datePicker.prevUnit()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+          <span class="material-symbols-outlined text-sm">arrow_upward</span>
+        </button>
+        <button type="button" onclick="datePicker.nextUnit()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+          <span class="material-symbols-outlined text-sm">arrow_downward</span>
+        </button>
+      </div>
+    </div>
+    <!-- Year/Month Picker Panel -->
+    <div id="cal-picker-panel" class="hidden">
+      <div id="cal-picker-grid" class="grid grid-cols-3 gap-1" style="min-height:168px"></div>
+    </div>
+    <!-- Normal Calendar View -->
+    <div id="cal-normal-view">
+      <div class="grid grid-cols-7 mb-1">
+        <div class="cal-header-cell sun">일</div>
+        <div class="cal-header-cell">월</div>
+        <div class="cal-header-cell">화</div>
+        <div class="cal-header-cell">수</div>
+        <div class="cal-header-cell">목</div>
+        <div class="cal-header-cell">금</div>
+        <div class="cal-header-cell sat">토</div>
+      </div>
+      <div id="cal-grid" class="grid grid-cols-7 gap-y-0.5"></div>
+    </div>
+  </div>
+  <div class="flex justify-between px-4 py-3 border-t border-surface-container">
+    <button type="button" onclick="datePicker.clear()" class="text-sm text-on-surface-variant hover:text-error transition-colors px-2 py-1 rounded-lg">삭제</button>
+    <button type="button" onclick="datePicker.today()" class="text-sm text-primary font-semibold px-2 py-1 rounded-lg hover:bg-primary/10 transition-colors">오늘</button>
+  </div>
+</div>
+
+<!-- ==================== CONFIRM DIALOG ==================== -->
+<div id="confirm-dialog" class="fixed inset-0 z-[200] hidden items-center justify-center" style="background:rgba(0,0,0,0.25);backdrop-filter:blur(3px)">
+  <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-xs w-full mx-4 slide-in">
+    <p id="confirm-message" class="text-on-surface text-sm font-medium mb-5 leading-relaxed"></p>
+    <div class="flex gap-3 justify-end">
+      <button id="confirm-cancel-btn" class="px-5 py-2 rounded-full bg-surface-container text-on-surface-variant text-sm font-semibold hover:bg-surface-container-high transition-colors">취소</button>
+      <button id="confirm-ok-btn" class="px-5 py-2 rounded-full bg-error text-on-error text-sm font-semibold hover:opacity-90 transition-opacity">삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TOAST CONTAINER ==================== -->
+<div id="toast-container" class="fixed bottom-6 left-1/2 z-[500] flex flex-col gap-2 pointer-events-none" style="transform:translateX(-50%)"></div>
+
+<!-- ==================== BACKGROUND DECORATIONS ==================== -->
+<div class="fixed top-0 right-0 -z-10 w-1/3 h-1/2 bg-gradient-to-bl from-primary-container/10 to-transparent rounded-full blur-3xl opacity-40 translate-x-1/4 -translate-y-1/4 pointer-events-none"></div>
+<div class="fixed bottom-0 left-72 -z-10 w-1/4 h-1/3 bg-gradient-to-tr from-tertiary-container/20 to-transparent rounded-full blur-3xl opacity-30 -translate-x-1/4 translate-y-1/4 pointer-events-none"></div>
+
+<script>
+// ============================================================
+//  DATA LAYER
+// ============================================================
+const STORAGE_KEYS = { transactions: 'ledgerly_transactions', settings: 'ledgerly_settings', tags: 'ledgerly_tags' };
+function getTags() { try { const t = JSON.parse(localStorage.getItem(STORAGE_KEYS.tags)); return Array.isArray(t) ? t : []; } catch { return []; } }
+function saveTags(tags) { localStorage.setItem(STORAGE_KEYS.tags, JSON.stringify(tags)); }
+
+function getTransactions() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.transactions)) || []; }
+  catch { return []; }
+}
+function saveTransactions(txs) { localStorage.setItem(STORAGE_KEYS.transactions, JSON.stringify(txs)); }
+
+function getSettings() {
+  const defaults = { name:'', year: new Date().getFullYear(), businessType:'design', expenseMethod:'simple_ratio', customExpenseRatio:0.641, dependents:0, taxToggles: { pension: true, health: true, longTermCare: true } };
+  try { return { ...defaults, ...JSON.parse(localStorage.getItem(STORAGE_KEYS.settings)) }; }
+  catch { return defaults; }
+}
+function saveSettings(s) { localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(s)); }
+
+function addTransaction(tx) {
+  const txs = getTransactions();
+  tx.id = crypto.randomUUID();
+  txs.unshift(tx);
+  saveTransactions(txs);
+  return tx;
+}
+function deleteTransaction(id) {
+  saveTransactions(getTransactions().filter(t => t.id !== id));
+}
+function uuid() { return crypto.randomUUID(); }
+
+// ============================================================
+//  TAX ENGINE (2024 Korean Freelancer)
+// ============================================================
+const TAX_BRACKETS = [
+  { limit: 14000000, rate: 0.06, deduction: 0 },
+  { limit: 50000000, rate: 0.15, deduction: 1260000 },
+  { limit: 88000000, rate: 0.24, deduction: 5760000 },
+  { limit: 150000000, rate: 0.35, deduction: 15440000 },
+  { limit: 300000000, rate: 0.38, deduction: 19940000 },
+  { limit: 500000000, rate: 0.40, deduction: 25940000 },
+  { limit: 1000000000, rate: 0.42, deduction: 35940000 },
+  { limit: Infinity, rate: 0.45, deduction: 65940000 },
+];
+
+const EXPENSE_RATIOS = {
+  design: { label: 'IT/디자인/개발', ratio: 0.641 },
+  writer: { label: '작가/강사', ratio: 0.606 },
+  consulting: { label: '컨설팅', ratio: 0.641 },
+  other: { label: '기타 서비스', ratio: 0.526 },
+};
+
+function calcProgressiveTax(taxable) {
+  if (taxable <= 0) return 0;
+  for (const b of TAX_BRACKETS) {
+    if (taxable <= b.limit) return Math.max(0, taxable * b.rate - b.deduction);
+  }
+  return 0;
+}
+
+function getEffectiveBracket(taxable) {
+  for (const b of TAX_BRACKETS) {
+    if (taxable <= b.limit) return b;
+  }
+  return TAX_BRACKETS[TAX_BRACKETS.length - 1];
+}
+
+function calculateTax(grossIncome, expenses, withheldTax, settings) {
+  const expenseRatio = EXPENSE_RATIOS[settings.businessType]?.ratio || settings.customExpenseRatio || 0.641;
+  const expenseAmount = settings.expenseMethod === 'simple_ratio'
+    ? grossIncome * expenseRatio
+    : expenses;
+
+  const businessIncome = Math.max(0, grossIncome - expenseAmount);
+  const basicDeduction = 1500000 * (1 + (settings.dependents || 0));
+  const taxableIncome = Math.max(0, businessIncome - basicDeduction);
+
+  const incomeTax = calcProgressiveTax(taxableIncome);
+  const localTax = Math.round(incomeTax * 0.1);
+  const tg = settings.taxToggles || {};
+  const pension = tg.pension !== false ? Math.min(Math.round(businessIncome * 0.09), 6372000) : 0;
+  const healthIns = tg.health !== false ? Math.round(businessIncome * 0.0709) : 0;
+  const ltci = tg.longTermCare !== false ? Math.round(healthIns * 0.1281) : 0;
+
+  const totalSocialIns = pension + healthIns + ltci;
+  const totalTax = Math.round(incomeTax) + localTax + totalSocialIns;
+  const withheld = withheldTax;
+  const additionalTax = Math.round(incomeTax) + localTax - withheld;
+
+  const effectiveRate = grossIncome > 0 ? ((totalTax / grossIncome) * 100) : 0;
+
+  return {
+    grossIncome, expenseAmount: Math.round(expenseAmount), expenseRatio,
+    businessIncome, basicDeduction, taxableIncome,
+    incomeTax: Math.round(incomeTax), localTax, pension, healthIns, ltci,
+    totalSocialIns, totalTax, withheld, additionalTax,
+    netIncome: grossIncome - totalTax,
+    effectiveRate: effectiveRate.toFixed(1),
+    bracket: getEffectiveBracket(taxableIncome)
+  };
+}
+
+// ============================================================
+//  HELPERS
+// ============================================================
+function fmt(n) { return new Intl.NumberFormat('ko-KR').format(Math.round(n)); }
+function fmtW(n) { return '₩' + fmt(n); }
+function fmtDate(d) {
+  const dt = new Date(d);
+  return `${dt.getFullYear()}. ${dt.getMonth()+1}. ${dt.getDate()}.`;
+}
+function fmtDateShort(d) {
+  if (!d) return '';
+  const dt = new Date(d);
+  return `${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')}`;
+}
+function fmtWorkPeriod(t) {
+  if (t.workStart) return t.workEnd ? `${fmtDateShort(t.workStart)} ~ ${fmtDateShort(t.workEnd)}` : fmtDateShort(t.workStart);
+  return fmtDate(t.date);
+}
+function getTaxType(t) {
+  if (t.taxType) return t.taxType;
+  if (t.unreported) return 'unreported';
+  if (t.withholding) return 'withholding_3.3';
+  return 'none';
+}
+function getPaymentStatus(t) { return t.paymentStatus || 'confirmed'; }
+function taxBadge(taxType) {
+  const map = { none: ['없음','#acadad','#fff'], withholding_3_3: ['3.3%','#005da7','#eef3ff'], withholding_1_65: ['1.65%','#4f5d67','#e7f5ff'], unreported: ['세금미신고','#b31b25','#ffefee'], exception: ['예외','#757777','#fff'] };
+  const key = (taxType||'none').replace(/\./g,'_');
+  const [label, bg, color] = map[key] || map['none'];
+  return `<span class="tx-badge" style="background:${bg};color:${color}">${label}</span>`;
+}
+function statusBadge(status) {
+  const map = { confirmed: ['확인완료','#525e55','#e9f6ea'], unconfirmed: ['미확인','#b31b25','#ffefee'], pending: ['미확정','#acadad','#fff'] };
+  const [label, bg, color] = map[status] || map['confirmed'];
+  return `<span class="tx-badge" style="background:${bg};color:${color}">${label}</span>`;
+}
+function fmtDateKo(d) {
+  if (!d) return '';
+  const dt = new Date(d + 'T00:00:00');
+  return `${dt.getFullYear()}년 ${dt.getMonth()+1}월 ${dt.getDate()}일`;
+}
+
+const datePicker = {
+  year: 0, month: 0, targetId: null,
+  pickerMode: null, // null | 'year' | 'month'
+  pickerYearBase: 0,
+  show(targetId, anchor) {
+    this.targetId = targetId;
+    this.pickerMode = null;
+    const val = document.getElementById(targetId)?.value;
+    const d = val ? new Date(val + 'T00:00:00') : new Date();
+    this.year = d.getFullYear(); this.month = d.getMonth();
+    this.render();
+    const el = document.getElementById('custom-calendar');
+    el.classList.remove('hidden');
+    const rect = anchor.getBoundingClientRect();
+    const calW = 280, calH = 360;
+    let left = rect.left;
+    if (left + calW > window.innerWidth - 8) left = window.innerWidth - calW - 8;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const top = spaceBelow >= calH || spaceBelow >= rect.top ? rect.bottom + 6 : rect.top - calH - 6;
+    el.style.left = Math.max(8, left) + 'px';
+    el.style.top = top + 'px';
+  },
+  hide() { document.getElementById('custom-calendar').classList.add('hidden'); this.pickerMode = null; },
+  prevMonth() { this.month--; if (this.month < 0) { this.month = 11; this.year--; } this.render(); },
+  nextMonth() { this.month++; if (this.month > 11) { this.month = 0; this.year++; } this.render(); },
+  prevUnit() {
+    if (this.pickerMode === 'year') { this.pickerYearBase -= 8; this.renderPicker(); }
+    else if (this.pickerMode === 'month') { this.year--; this.renderPicker(); }
+    else { this.prevMonth(); }
+  },
+  nextUnit() {
+    if (this.pickerMode === 'year') { this.pickerYearBase += 8; this.renderPicker(); }
+    else if (this.pickerMode === 'month') { this.year++; this.renderPicker(); }
+    else { this.nextMonth(); }
+  },
+  togglePicker() {
+    if (this.pickerMode === null) {
+      this.pickerMode = 'year';
+      this.pickerYearBase = this.year;
+      this.renderPicker();
+    } else {
+      this.pickerMode = null;
+      document.getElementById('cal-picker-panel').classList.add('hidden');
+      document.getElementById('cal-normal-view').classList.remove('hidden');
+      this.render();
+    }
+  },
+  renderPicker() {
+    document.getElementById('cal-picker-panel').classList.remove('hidden');
+    document.getElementById('cal-normal-view').classList.add('hidden');
+    const grid = document.getElementById('cal-picker-grid');
+    grid.innerHTML = '';
+    if (this.pickerMode === 'year') {
+      document.getElementById('cal-month-label').textContent = '연도 선택';
+      for (let y = this.pickerYearBase - 4; y <= this.pickerYearBase + 3; y++) {
+        const btn = document.createElement('button');
+        btn.type = 'button'; btn.textContent = `${y}년`;
+        const isSel = y === this.year;
+        btn.className = 'text-sm py-2 px-1 rounded-lg transition-colors ' + (isSel ? 'bg-primary text-on-primary font-bold' : 'hover:bg-surface-container text-on-surface');
+        btn.onclick = () => { this.year = y; this.pickerMode = 'month'; this.renderPicker(); };
+        grid.appendChild(btn);
+      }
+    } else if (this.pickerMode === 'month') {
+      document.getElementById('cal-month-label').textContent = `${this.year}년`;
+      ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'].forEach((name, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button'; btn.textContent = name;
+        const isSel = i === this.month;
+        btn.className = 'text-sm py-2 px-1 rounded-lg transition-colors ' + (isSel ? 'bg-primary text-on-primary font-bold' : 'hover:bg-surface-container text-on-surface');
+        btn.onclick = () => {
+          this.month = i; this.pickerMode = null;
+          document.getElementById('cal-picker-panel').classList.add('hidden');
+          document.getElementById('cal-normal-view').classList.remove('hidden');
+          this.render();
+        };
+        grid.appendChild(btn);
+      });
+    }
+  },
+  setVal(val) {
+    const input = document.getElementById(this.targetId);
+    if (input) input.value = val;
+    const trigger = document.querySelector(`[data-cal="${this.targetId}"]`);
+    if (trigger) {
+      const disp = trigger.querySelector('.cal-display');
+      if (disp) { disp.textContent = val ? fmtDateKo(val) : (this.targetId === 'tx-work-end' ? '종료일 (선택)' : '시작일 선택'); disp.classList.toggle('text-on-surface-variant', !val); disp.classList.toggle('text-on-surface', !!val); }
+    }
+  },
+  select(day) {
+    const d = new Date(this.year, this.month, day);
+    const val = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    this.setVal(val); this.hide();
+  },
+  clear() { this.setVal(''); this.hide(); },
+  today() { const t = new Date(); this.year = t.getFullYear(); this.month = t.getMonth(); this.render(); this.select(t.getDate()); },
+  render() {
+    this.pickerMode = null;
+    document.getElementById('cal-picker-panel')?.classList.add('hidden');
+    document.getElementById('cal-normal-view')?.classList.remove('hidden');
+    document.getElementById('cal-month-label').textContent = `${this.year}년 ${this.month+1}월`;
+    const today = new Date();
+    const selVal = document.getElementById(this.targetId)?.value;
+    const sel = selVal ? new Date(selVal + 'T00:00:00') : null;
+    const firstDay = new Date(this.year, this.month, 1).getDay();
+    const daysInMonth = new Date(this.year, this.month+1, 0).getDate();
+    const daysInPrev = new Date(this.year, this.month, 0).getDate();
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+    const mkBtn = (label, classes, onClick) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = label; b.className = 'cal-day ' + classes;
+      if (onClick) b.onclick = onClick;
+      return b;
+    };
+    for (let i = firstDay - 1; i >= 0; i--) grid.appendChild(mkBtn(daysInPrev - i, 'cal-day-other'));
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dow = new Date(this.year, this.month, d).getDay();
+      const isToday = today.getFullYear()===this.year && today.getMonth()===this.month && today.getDate()===d;
+      const isSel = sel && sel.getFullYear()===this.year && sel.getMonth()===this.month && sel.getDate()===d;
+      let cls = isSel ? 'cal-day-selected' : isToday ? 'cal-day-today' : '';
+      const btn = mkBtn(d, cls, () => this.select(d));
+      if (!isSel) { if (dow===0) btn.style.color='#b31b25'; else if (dow===6) btn.style.color='#4f5d67'; }
+      grid.appendChild(btn);
+    }
+    const total = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+    for (let n = 1; n <= total - firstDay - daysInMonth; n++) grid.appendChild(mkBtn(n, 'cal-day-other'));
+  }
+};
+document.addEventListener('click', e => {
+  const cal = document.getElementById('custom-calendar');
+  if (cal && !cal.classList.contains('hidden') && !cal.contains(e.target) && !e.target.closest('.cal-trigger')) datePicker.hide();
+});
+
+function calcWithheldTax(txs) {
+  return txs.filter(t=>t.type==='income').reduce((s,t) => {
+    const tt = getTaxType(t);
+    if (tt==='withholding_3.3') return s + Math.round(t.amount*0.033);
+    if (tt==='withholding_1.65') return s + Math.round(t.amount*0.0165);
+    return s;
+  }, 0);
+}
+function calcReportableIncome(txs) {
+  return txs.filter(t => {
+    if (t.type !== 'income') return false;
+    const tt = getTaxType(t);
+    return tt !== 'unreported' && tt !== 'exception';
+  }).reduce((s,t) => s+t.amount, 0);
+}
+function calcTotalIncome(txs) {
+  return txs.filter(t => t.type === 'income').reduce((s,t) => s + t.amount, 0);
+}
+function calcTotalActualIncome(txs) {
+  return txs.filter(t => t.type === 'income').reduce((s,t) => s + (t.actualAmount || t.amount), 0);
+}
+function getMonthName(m) { return ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'][m]; }
+
+function getYearTransactions(year) {
+  return getTransactions().filter(t => new Date(t.date).getFullYear() === year);
+}
+function getMonthTransactions(year, month) {
+  return getTransactions().filter(t => {
+    const d = new Date(t.date);
+    return d.getFullYear() === year && d.getMonth() === month;
+  });
+}
+
+// ============================================================
+//  ROUTER
+// ============================================================
+let currentView = 'dashboard';
+const PAGE_TITLES = { dashboard: '대시보드', income: '수입 및 지출 관리', tax: '세금 계산기', reports: '리포트' };
+
+function navigate(view) {
+  currentView = view;
+  document.querySelectorAll('.nav-link').forEach(a => {
+    const isActive = a.dataset.view === view;
+    a.className = `nav-link rounded-full px-4 py-3 mx-4 transition-all flex items-center space-x-3 cursor-pointer ${
+      isActive ? 'bg-blue-50 text-blue-700 font-semibold scale-95' : 'text-slate-500 hover:bg-slate-50'
+    }`;
+    const icon = a.querySelector('.material-symbols-outlined');
+    if (icon) icon.className = `material-symbols-outlined ${isActive ? 'icon-filled' : ''}`;
+  });
+  document.getElementById('page-title').textContent = PAGE_TITLES[view] || '';
+  document.getElementById('header-year').textContent = getSettings().year + '년';
+  renderView(view);
+}
+
+function renderView(view) {
+  const container = document.getElementById('view-container');
+  container.innerHTML = '';
+  container.className = 'p-10 space-y-12 slide-in';
+  switch(view) {
+    case 'dashboard': renderDashboard(container); break;
+    case 'income': renderIncome(container); break;
+    case 'tax': renderTaxCalc(container); break;
+    case 'reports': renderReports(container); break;
+  }
+}
+
+// ============================================================
+//  DASHBOARD VIEW
+// ============================================================
+function renderDashboard(el) {
+  const settings = getSettings();
+  const now = new Date();
+  const dashYear = now.getFullYear();
+  const month = now.getMonth();
+  const monthTxs = getMonthTransactions(dashYear, month);
+  const yearTxs = getYearTransactions(dashYear);
+
+  const monthIncome = monthTxs.filter(t=>t.type==='income').reduce((s,t)=>s+(t.actualAmount||t.amount), 0);
+  const yearTotalIncome = calcTotalIncome(yearTxs);
+  const yearReportable = calcReportableIncome(yearTxs);
+  const yearExpense = yearTxs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount, 0);
+  const withheldTax = calcWithheldTax(yearTxs);
+
+  const tax = calculateTax(yearReportable, yearExpense, withheldTax, settings);
+  const monthEstTax = (monthIncome > 0 && yearTotalIncome > 0) ? Math.round(monthIncome * (tax.totalTax / yearTotalIncome)) : 0;
+  const monthNet = monthIncome - monthEstTax;
+
+  // Previous month (handles January → prev year December)
+  const prevYear = month === 0 ? dashYear - 1 : dashYear;
+  const prevMonth = month === 0 ? 11 : month - 1;
+  const prevMonthTxs = getMonthTransactions(prevYear, prevMonth);
+  const prevIncome = prevMonthTxs.filter(t=>t.type==='income').reduce((s,t)=>s+(t.actualAmount||t.amount), 0);
+  const growthPct = prevIncome > 0 ? (((monthIncome - prevIncome) / prevIncome) * 100).toFixed(1) : '—';
+  const growthPositive = monthIncome >= prevIncome;
+
+  const retentionRate = yearTotalIncome > 0 ? Math.round(((yearTotalIncome - tax.totalTax) / yearTotalIncome) * 100) : 0;
+  const recentTxs = getTransactions().sort((a,b) => new Date(b.date||0) - new Date(a.date||0)).slice(0, 5);
+
+  el.innerHTML = `
+    <!-- Overview Cards -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="col-span-1 md:col-span-2 relative overflow-hidden bg-primary-container/5 rounded-lg p-10 flex flex-col justify-between">
+        <div class="absolute top-0 right-0 p-8 text-primary/10"><span class="material-symbols-outlined text-8xl">trending_up</span></div>
+        <div class="relative z-10">
+          <p class="text-label-md text-on-surface-variant mb-4 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-primary"></span>이번 달 총 수입
+          </p>
+          <h3 class="text-display-lg text-primary tracking-tighter">${fmtW(monthIncome)}</h3>
+          <p class="text-sm text-on-surface-variant mt-2">${dashYear}년 총 수입 <span class="font-semibold text-on-surface">${fmtW(yearTotalIncome)}</span></p>
+        </div>
+        <div class="mt-8 flex items-center gap-4 relative z-10">
+          ${growthPct !== '—' ? `<span class="px-4 py-1.5 ${growthPositive ? 'bg-primary text-on-primary' : 'bg-error/10 text-error'} rounded-full text-xs font-semibold">${growthPositive ? '+' : ''}${growthPct}% 전월 대비</span>` : '<span class="px-4 py-1.5 bg-surface-container rounded-full text-xs text-on-surface-variant">전월 데이터 없음</span>'}
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"></div>
+      </div>
+      <div class="bg-tertiary-container/30 rounded-lg p-10 flex flex-col justify-between">
+        <div>
+          <p class="text-label-md text-on-tertiary-container mb-4 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-tertiary"></span>순수입 (세후)
+          </p>
+          <h3 class="text-headline-md text-on-surface">${fmtW(monthNet)}</h3>
+        </div>
+        <div class="mt-10 space-y-4">
+          <div class="flex justify-between items-center text-sm pb-2">
+            <span class="text-on-surface-variant">예상 세금</span>
+            <span class="font-medium text-error">${fmtW(monthEstTax)}</span>
+          </div>
+          <p class="text-[11px] text-on-surface-variant leading-relaxed">연간 총 세금 기준으로 월 추정한 금액입니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fiscal Health + Recent -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div class="lg:col-span-4 bg-surface-container-lowest rounded-lg p-8 h-full">
+        <h4 class="text-title-lg mb-8">재정 건강 리포트</h4>
+        <div class="relative flex items-center justify-center py-6">
+          <svg width="192" height="192" viewBox="0 0 192 192" class="transform -rotate-90">
+            <circle cx="96" cy="96" r="80" stroke="#e7e8e8" stroke-width="16" fill="none"/>
+            <circle cx="96" cy="96" r="80" stroke="#005da7" stroke-width="16" fill="none"
+              stroke-dasharray="${2 * Math.PI * 80}" stroke-dashoffset="${2 * Math.PI * 80 * (1 - retentionRate / 100)}"
+              stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease"/>
+          </svg>
+          <div class="absolute text-center">
+            <span class="text-4xl font-bold text-on-surface">${retentionRate}%</span>
+            <p class="text-label-md text-on-surface-variant">보유율</p>
+          </div>
+        </div>
+        <p class="mt-4 text-sm text-on-surface-variant text-center">
+          ${retentionRate >= 70 ? '<strong>우수</strong> — 수입 대비 세후 보유 비율이 높습니다.' :
+            retentionRate >= 50 ? '<strong>양호</strong> — 수입 대비 보유 비율이 적정합니다.' :
+            '<strong>주의</strong><br>세금 비율이 높습니다.<br>경비 처리를 확인하세요.'}
+        </p>
+      </div>
+
+      <div class="lg:col-span-8 bg-surface-container-lowest rounded-lg p-8">
+        <div class="flex items-center justify-between mb-8">
+          <h4 class="text-title-lg">최근 거래</h4>
+          <button onclick="navigate('income')" class="text-primary text-sm font-semibold hover:underline">전체 보기</button>
+        </div>
+        <div class="space-y-1">
+          ${recentTxs.length === 0 ? '<p class="text-on-surface-variant text-sm py-8 text-center">아직 거래 내역이 없습니다. 수입/지출 탭에서 추가해보세요.</p>' :
+            recentTxs.map(t => {
+              const tt = getTaxType(t);
+              const ps = getPaymentStatus(t);
+              return `
+            <div class="flex items-center justify-between py-4 px-4 hover:bg-surface-container-low transition-colors rounded-lg">
+              <div class="flex items-center gap-4 min-w-0">
+                <div class="w-12 h-12 rounded-full flex-shrink-0 ${t.type==='income' ? 'bg-tertiary-container text-tertiary' : 'bg-error-container/10 text-error'} flex items-center justify-center">
+                  <span class="material-symbols-outlined ${t.type==='income' ? 'icon-filled' : ''}">${t.type==='income' ? 'account_balance_wallet' : 'receipt'}</span>
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5 flex-wrap mb-0.5">
+                    <p class="font-semibold text-on-surface">${escapeHtml(t.project || t.description || t.client || '거래')}</p>
+                    ${t.type==='income' ? taxBadge(tt) : ''}
+                    ${t.type==='income' ? statusBadge(ps) : ''}
+                  </div>
+                  <p class="text-xs text-on-surface-variant">${fmtWorkPeriod(t)}${t.client ? ' · ' + escapeHtml(t.client) : ''}</p>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <p class="font-bold ${t.type==='income' ? 'text-tertiary' : 'text-on-surface'}">${t.type==='income' ? '+' : '-'} ${fmtW(t.amount)}</p>
+              </div>
+            </div>`;}).join('')}
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Add CTA -->
+    <section class="flex justify-center py-4">
+      <button onclick="openAddTransaction()" class="bg-primary text-on-primary px-10 py-5 rounded-full flex items-center gap-3 shadow-lg shadow-primary/20 hover:scale-105 transition-transform duration-300">
+        <span class="material-symbols-outlined">add_circle</span>
+        <span class="text-base font-semibold">새 거래 추가</span>
+      </button>
+    </section>
+  `;
+}
+
+// ============================================================
+//  INCOME VIEW
+// ============================================================
+let incomeFilter = 'all';
+let incomeYearFilter = 'all';
+let reportYearFilter = new Date().getFullYear();
+let taxYearFilter = new Date().getFullYear();
+let taxTogglePanelOpen = false;
+let editingTxId = null;
+let _pendingEditTags = null;
+
+function renderIncome(el) {
+  const allTxs = getTransactions();
+  // Unique years from transactions, sorted descending
+  const years = [...new Set(allTxs.map(t => new Date((t.date||'2000-01-01')+'T00:00:00').getFullYear()))].sort((a,b)=>b-a);
+  // Apply year filter
+  const yearTxs = incomeYearFilter === 'all' ? allTxs : allTxs.filter(t => new Date((t.date||'2000-01-01')+'T00:00:00').getFullYear() === incomeYearFilter);
+  // Sort by date descending, then apply type filter
+  const sorted = [...yearTxs].sort((a,b) => new Date(b.date||0) - new Date(a.date||0));
+  const filtered = incomeFilter === 'all' ? sorted : sorted.filter(t => t.type === incomeFilter);
+
+  const totalIncome = yearTxs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount, 0);
+  const totalActualIncome = yearTxs.filter(t=>t.type==='income').reduce((s,t)=>s+(t.actualAmount||t.amount), 0);
+  const totalExpense = yearTxs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount, 0);
+  const withheldTotal = calcWithheldTax(yearTxs);
+
+  el.innerHTML = `
+    <!-- Summary Cards -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-primary-container/5 rounded-lg p-8">
+        <p class="text-label-md text-on-surface-variant mb-2">총 수입 (실입금)</p>
+        <p class="text-headline-md text-primary">${fmtW(totalActualIncome)}</p>
+        <p class="text-xs text-on-surface-variant mt-1.5">세전 ${fmtW(totalIncome)}</p>
+      </div>
+      <div class="bg-error-container/5 rounded-lg p-8">
+        <p class="text-label-md text-on-surface-variant mb-2">총 지출</p>
+        <p class="text-headline-md text-error">${fmtW(totalExpense)}</p>
+      </div>
+      <div class="bg-secondary-container/30 rounded-lg p-8">
+        <p class="text-label-md text-on-surface-variant mb-2">원천징수 기납부액</p>
+        <p class="text-headline-md text-secondary">${fmtW(withheldTotal)}</p>
+      </div>
+    </section>
+
+    <!-- Year Filter -->
+    <section class="flex items-center gap-2 flex-wrap">
+      <span class="text-label-md text-on-surface-variant">년도</span>
+      <button onclick="setYearFilter('all')" class="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${incomeYearFilter==='all'?'bg-on-surface text-surface':'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">전체</button>
+      ${years.map(y => `<button onclick="setYearFilter(${y})" class="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${incomeYearFilter===y?'bg-on-surface text-surface':'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">${y}년</button>`).join('')}
+    </section>
+
+    <!-- Filter + Add -->
+    <section class="flex items-center justify-between">
+      <div class="flex gap-2">
+        <button onclick="setIncomeFilter('all')" class="px-4 py-2 rounded-full text-sm font-medium transition-colors ${incomeFilter==='all'?'bg-primary text-on-primary':'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">전체</button>
+        <button onclick="setIncomeFilter('income')" class="px-4 py-2 rounded-full text-sm font-medium transition-colors ${incomeFilter==='income'?'bg-primary text-on-primary':'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">수입</button>
+        <button onclick="setIncomeFilter('expense')" class="px-4 py-2 rounded-full text-sm font-medium transition-colors ${incomeFilter==='expense'?'bg-primary text-on-primary':'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">지출</button>
+      </div>
+      <button onclick="openAddTransaction()" class="bg-primary text-on-primary px-6 py-3 rounded-full flex items-center gap-2 text-sm font-semibold hover:scale-105 transition-transform shadow-md shadow-primary/20">
+        <span class="material-symbols-outlined text-lg">add</span>새 거래 추가
+      </button>
+    </section>
+
+    <!-- Transaction List -->
+    <section class="bg-surface-container-lowest rounded-lg p-6">
+      ${filtered.length === 0 ? '<p class="text-on-surface-variant text-sm py-12 text-center">거래 내역이 없습니다.</p>' :
+        `<div class="space-y-1">${filtered.map(t => {
+          const tt = getTaxType(t);
+          const ps = getPaymentStatus(t);
+          const netAmt = tt==='withholding_3.3' ? t.amount*0.967 : tt==='withholding_1.65' ? t.amount*0.9835 : 0;
+          const showNet = netAmt > 0 && t.type==='income';
+          const actualDiffers = t.actualAmount && t.actualAmount !== t.amount;
+          return `
+        <div class="flex items-center justify-between py-4 px-4 hover:bg-surface-container-low transition-colors rounded-lg group">
+          <div class="flex items-center gap-4 min-w-0">
+            <div class="w-10 h-10 rounded-full flex-shrink-0 ${t.type==='income' ? 'bg-tertiary-container text-tertiary' : 'bg-error-container/10 text-error'} flex items-center justify-center">
+              <span class="material-symbols-outlined text-xl">${t.type==='income' ? 'north_east' : 'south_west'}</span>
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap mb-0.5">
+                <p class="font-semibold text-on-surface text-sm">${escapeHtml(t.project || t.description || '—')}</p>
+                ${t.type==='income' ? taxBadge(tt) : ''}
+                ${t.type==='income' ? statusBadge(ps) : ''}
+                ${(t.tags||[]).map(tag=>`<span class="tx-badge" style="background:#e7e8e8;color:#5a5c5c">${escapeHtml(tag)}</span>`).join('')}
+              </div>
+              <p class="text-xs text-on-surface-variant" style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${fmtWorkPeriod(t)}${t.client ? ' · ' + escapeHtml(t.client) : ''}${t.notes ? ' · ' + escapeHtml(t.notes) : ''}</p>
+            </div>
+          </div>
+          <div class="flex-shrink-0 relative" style="min-width:140px">
+            <div class="text-right transition-opacity duration-150 group-hover:opacity-0">
+              <p class="font-bold text-sm ${t.type==='income' ? 'text-tertiary' : 'text-error'}">${t.type==='income' ? '+' : '-'} ${fmtW(t.amount)}</p>
+              ${showNet ? `<p class="text-[10px] text-on-surface-variant">실수령 ${fmtW(Math.round(netAmt))}</p>` : ''}
+              ${actualDiffers ? `<p class="text-[10px] text-primary font-semibold">실입금 ${fmtW(t.actualAmount)}</p>` : ''}
+            </div>
+            <div class="absolute inset-0 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+              <button onclick="openEditTransaction('${t.id}')" class="p-1.5 hover:bg-primary/10 rounded-full text-primary transition-colors">
+                <span class="material-symbols-outlined text-lg">edit</span>
+              </button>
+              <button onclick="confirmDelete('${t.id}')" class="p-1.5 hover:bg-error/10 rounded-full text-error transition-colors">
+                <span class="material-symbols-outlined text-lg">delete</span>
+              </button>
+            </div>
+          </div>
+        </div>`;}).join('')}</div>`}
+    </section>
+  `;
+}
+
+function setIncomeFilter(f) { incomeFilter = f; renderView('income'); }
+function setYearFilter(y) { incomeYearFilter = y; renderView('income'); }
+function setReportYearFilter(y) { reportYearFilter = y; renderView('reports'); }
+function setTaxYearFilter(y) { taxYearFilter = y; renderView('tax'); }
+
+function confirmDelete(id) {
+  showConfirm('이 거래를 삭제하시겠습니까?', () => {
+    deleteTransaction(id);
+    renderView(currentView);
+  });
+}
+
+function openEditTransaction(id) {
+  const tx = getTransactions().find(t => t.id === id);
+  if (!tx) return;
+  editingTxId = id;
+  _pendingEditTags = tx.tags || [];
+  openAddTransaction();
+  // Patch title
+  const h3 = document.querySelector('#modal-content h3');
+  if (h3) h3.textContent = '거래 수정';
+  // Patch type
+  const typeEl = document.getElementById('tx-type');
+  if (typeEl) { typeEl.value = tx.type; typeEl.dispatchEvent(new Event('change')); }
+  // Patch dates
+  const patchCal = (hidId, val) => {
+    const hid = document.getElementById(hidId);
+    if (!hid) return;
+    hid.value = val || '';
+    const disp = document.querySelector(`[data-cal="${hidId}"] .cal-display`);
+    if (disp && val) {
+      disp.textContent = fmtDateKo(val);
+      disp.classList.remove('text-on-surface-variant');
+      disp.classList.add('text-on-surface');
+    }
+  };
+  patchCal('tx-date', tx.date);
+  patchCal('tx-work-start', tx.workStart);
+  patchCal('tx-work-end', tx.workEnd);
+  // Text fields
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('tx-project', tx.project || tx.description);
+  set('tx-client', tx.client);
+  set('tx-notes', tx.notes);
+  // Amount fields
+  const fmtAmt = v => (v !== undefined && v !== null) ? new Intl.NumberFormat('ko-KR').format(v) : '';
+  const amtEl = document.getElementById('tx-amount');
+  if (amtEl) amtEl.value = fmtAmt(tx.amount);
+  const actEl = document.getElementById('tx-actual');
+  if (actEl) actEl.value = tx.actualAmount ? fmtAmt(tx.actualAmount) : '';
+  // Expense-specific fields
+  set('tx-expense-category', tx.expenseCategory);
+  set('tx-payment-method', tx.paymentMethod);
+  set('tx-proof-url', tx.proofUrl);
+  // Tax type pill
+  const tt = getTaxType(tx);
+  const taxGroup = document.getElementById('tax-type-group');
+  if (taxGroup) {
+    taxGroup.querySelectorAll('.pill-opt').forEach(b => b.classList.remove('sel-blue','sel-green','sel-warn','sel-gray'));
+    const tb = taxGroup.querySelector(`[data-value="${tt}"]`);
+    if (tb) tb.classList.add(tt === 'none' || tt === 'exception' ? 'sel-gray' : 'sel-blue');
+  }
+  // Payment status pill
+  const ps = getPaymentStatus(tx);
+  const psGroup = document.getElementById('payment-status-group');
+  if (psGroup) {
+    psGroup.querySelectorAll('.pill-opt').forEach(b => b.classList.remove('sel-blue','sel-green','sel-warn','sel-gray'));
+    const pb = psGroup.querySelector(`[data-value="${ps}"]`);
+    if (pb) pb.classList.add(ps === 'confirmed' ? 'sel-green' : ps === 'unconfirmed' ? 'sel-warn' : 'sel-gray');
+  }
+}
+
+// ============================================================
+//  TAX CALCULATOR VIEW
+// ============================================================
+function renderTaxCalc(el) {
+  const settings = getSettings();
+  const allTxs = getTransactions();
+  const years = [...new Set(allTxs.map(t => new Date((t.date||'2000-01-01')+'T00:00:00').getFullYear()))].sort((a,b)=>b-a);
+  if (years.length > 0 && !years.includes(taxYearFilter)) taxYearFilter = years[0];
+  const year = taxYearFilter;
+  const yearTxs = getYearTransactions(year);
+  const grossIncome = calcTotalIncome(yearTxs);
+  const expenses = yearTxs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount, 0);
+  const withheldTax = calcWithheldTax(yearTxs);
+
+  const tax = calculateTax(grossIncome, expenses, withheldTax, settings);
+  const tg = settings.taxToggles || {};
+
+  // Donut chart
+  const donutPct = Math.min(parseFloat(tax.effectiveRate), 100);
+  const donutOffset = 2 * Math.PI * 70 * (1 - donutPct / 100);
+
+  el.innerHTML = `
+    <!-- Year Selector -->
+    <section class="flex items-center gap-2 flex-wrap">
+      <span class="text-label-md text-on-surface-variant">년도</span>
+      ${years.map(y => `<button onclick="setTaxYearFilter(${y})" class="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${taxYearFilter===y?'bg-on-surface text-surface':'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">${y}년</button>`).join('')}
+    </section>
+
+    <!-- Hero -->
+    <section class="bg-primary-container/5 rounded-lg p-10 relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-6 text-primary/10"><span class="material-symbols-outlined text-8xl">calculate</span></div>
+      <p class="text-label-md text-on-surface-variant mb-2">${year}년 예상 세액 리포트</p>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mt-6">
+        <div>
+          <p class="text-xs text-on-surface-variant mb-1">총 수입</p>
+          <p class="text-2xl font-bold text-primary">${fmtW(tax.grossIncome)}</p>
+        </div>
+        <div>
+          <p class="text-xs text-on-surface-variant mb-1">총 세금</p>
+          <p class="text-2xl font-bold text-error">${fmtW(tax.totalTax)}</p>
+        </div>
+        <div>
+          <p class="text-xs text-on-surface-variant mb-1">세후 순수입</p>
+          <p class="text-2xl font-bold text-tertiary">${fmtW(tax.netIncome)}</p>
+        </div>
+        <div class="flex items-center justify-start">
+          <div class="relative">
+            <svg width="140" height="140" viewBox="0 0 160 160" class="transform -rotate-90">
+              <circle cx="80" cy="80" r="70" stroke="#e7e8e8" stroke-width="12" fill="none"/>
+              <circle cx="80" cy="80" r="70" stroke="#005da7" stroke-width="12" fill="none"
+                stroke-dasharray="${2*Math.PI*70}" stroke-dashoffset="${donutOffset}"
+                stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center flex-col">
+              <span class="text-2xl font-bold">${tax.effectiveRate}%</span>
+              <span class="text-[10px] text-on-surface-variant">실효세율</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tax Breakdown -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="bg-surface-container-lowest rounded-lg p-8">
+        <div class="flex items-center justify-between mb-6">
+          <h4 class="text-title-lg">세목별 상세</h4>
+          <button onclick="taxTogglePanelOpen=!taxTogglePanelOpen;document.getElementById('tax-toggle-panel').classList.toggle('hidden')" class="p-1.5 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant">
+            <span class="material-symbols-outlined text-lg">tune</span>
+          </button>
+        </div>
+        <div id="tax-toggle-panel" class="${taxTogglePanelOpen?'':'hidden'} mb-5 p-4 bg-surface-container-low rounded-lg space-y-3">
+          <p class="text-xs text-on-surface-variant font-semibold mb-2">4대보험 포함 여부</p>
+          <div class="flex items-center justify-between">
+            <span class="text-sm">국민연금</span>
+            <div class="toggle-switch ${tg.pension!==false?'active':''}" onclick="toggleTaxItem('pension',this)"></div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm">건강보험</span>
+            <div class="toggle-switch ${tg.health!==false?'active':''}" onclick="toggleTaxItem('health',this)"></div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm">장기요양보험</span>
+            <div class="toggle-switch ${tg.longTermCare!==false?'active':''}" onclick="toggleTaxItem('longTermCare',this)"></div>
+          </div>
+        </div>
+        <div class="space-y-5">
+          ${taxBreakdownItem('종합소득세', tax.incomeTax, tax.totalTax, '#005da7')}
+          ${taxBreakdownItem('지방소득세', tax.localTax, tax.totalTax, '#4f5d67')}
+          ${tg.pension!==false ? taxBreakdownItem('국민연금', tax.pension, tax.totalTax, '#525e55') : ''}
+          ${tg.health!==false ? taxBreakdownItem('건강보험', tax.healthIns, tax.totalTax, '#68abff') : ''}
+          ${tg.longTermCare!==false ? taxBreakdownItem('장기요양보험', tax.ltci, tax.totalTax, '#acadad') : ''}
+        </div>
+        <div class="mt-8 pt-6 border-t border-surface-container space-y-3">
+          <div class="flex justify-between text-sm">
+            <span class="text-on-surface-variant">원천징수 기납부액 (3.3%)</span>
+            <span class="font-semibold text-primary">- ${fmtW(tax.withheld)}</span>
+          </div>
+          <div class="flex justify-between items-center pt-2">
+            <span class="font-semibold">${tax.additionalTax >= 0 ? '추가 납부액' : '환급 예상액'}</span>
+            <span class="text-xl font-bold ${tax.additionalTax >= 0 ? 'text-error' : 'text-tertiary'}">${tax.additionalTax >= 0 ? fmtW(tax.additionalTax) : fmtW(Math.abs(tax.additionalTax)) + ' 환급'}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calculation Steps -->
+      <div class="bg-surface-container-lowest rounded-lg p-8">
+        <h4 class="text-title-lg mb-6">계산 과정</h4>
+        <div class="space-y-4 text-sm">
+          ${calcStepItem('총 수입금액', fmtW(tax.grossIncome))}
+          ${calcStepItem(`필요경비 (${settings.expenseMethod==='simple_ratio' ? '단순경비율 ' + (tax.expenseRatio * 100).toFixed(1) + '%' : '실제 경비'})`, '- ' + fmtW(tax.expenseAmount))}
+          ${calcStepDivider()}
+          ${calcStepItem('사업소득금액', fmtW(tax.businessIncome), true)}
+          ${calcStepItem(`기본공제 (본인${settings.dependents > 0 ? ' + 부양가족 ' + settings.dependents + '명' : ''})`, '- ' + fmtW(tax.basicDeduction))}
+          ${calcStepDivider()}
+          ${calcStepItem('과세표준', fmtW(tax.taxableIncome), true)}
+          ${calcStepItem(`적용 세율 ${(tax.bracket.rate * 100).toFixed(0)}% (누진공제 ${fmtW(tax.bracket.deduction)})`, '')}
+          ${calcStepDivider()}
+          ${calcStepItem('종합소득세', fmtW(tax.incomeTax), true)}
+        </div>
+      </div>
+    </section>
+
+  `;
+}
+
+function toggleTaxItem(key, el) {
+  const s = getSettings();
+  const tg = s.taxToggles || { pension: true, health: true, longTermCare: true };
+  tg[key] = !tg[key];
+  s.taxToggles = tg;
+  saveSettings(s);
+  renderView('tax');
+}
+
+function taxBreakdownItem(label, amount, total, color) {
+  const pct = total > 0 ? (amount / total * 100) : 0;
+  return `
+    <div>
+      <div class="flex justify-between mb-1.5">
+        <span class="text-sm text-on-surface">${label}</span>
+        <span class="text-sm font-semibold">${fmtW(amount)}</span>
+      </div>
+      <div class="h-2 bg-surface-container rounded-full overflow-hidden">
+        <div class="h-full rounded-full transition-all duration-500" style="width:${pct}%; background:${color}"></div>
+      </div>
+    </div>`;
+}
+
+function calcStepItem(label, value, bold) {
+  return `<div class="flex justify-between items-center ${bold ? 'font-semibold text-on-surface' : 'text-on-surface-variant'}">
+    <span>${label}</span><span>${value}</span>
+  </div>`;
+}
+function calcStepDivider() {
+  return '<div class="border-t border-dashed border-outline-variant/30 my-1"></div>';
+}
+
+// ============================================================
+//  REPORTS VIEW
+// ============================================================
+function renderReports(el) {
+  const settings = getSettings();
+  const allTxs = getTransactions();
+  const years = [...new Set(allTxs.map(t => new Date((t.date||'2000-01-01')+'T00:00:00').getFullYear()))].sort((a,b)=>b-a);
+  if (years.length > 0 && !years.includes(reportYearFilter)) reportYearFilter = years[0];
+  const year = reportYearFilter;
+  const yearTxs = getYearTransactions(year);
+
+  // Monthly data
+  const monthlyData = Array.from({length: 12}, (_, i) => {
+    const mTxs = yearTxs.filter(t => new Date(t.date).getMonth() === i);
+    return {
+      income: mTxs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount, 0),
+      expense: mTxs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount, 0)
+    };
+  });
+  const maxVal = Math.max(...monthlyData.map(m => Math.max(m.income, m.expense)), 1);
+
+  const totalIncome = calcTotalIncome(yearTxs);
+  const totalExpense = yearTxs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount, 0);
+  const withheldTax = calcWithheldTax(yearTxs);
+  const tax = calculateTax(totalIncome, totalExpense, withheldTax, settings);
+
+  el.innerHTML = `
+    <!-- Year Selector -->
+    <section class="flex items-center gap-2 flex-wrap">
+      <span class="text-label-md text-on-surface-variant">년도</span>
+      ${years.map(y => `<button onclick="setReportYearFilter(${y})" class="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${reportYearFilter===y?'bg-on-surface text-surface':'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}">${y}년</button>`).join('')}
+    </section>
+
+    <!-- Year Summary -->
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="bg-primary-container/5 rounded-lg p-6">
+        <p class="text-label-md text-on-surface-variant mb-2">연간 총 수입</p>
+        <p class="text-xl font-bold text-primary">${fmtW(totalIncome)}</p>
+      </div>
+      <div class="bg-error-container/5 rounded-lg p-6">
+        <p class="text-label-md text-on-surface-variant mb-2">연간 총 지출</p>
+        <p class="text-xl font-bold text-error">${fmtW(totalExpense)}</p>
+      </div>
+      <div class="bg-surface-container rounded-lg p-6">
+        <p class="text-label-md text-on-surface-variant mb-2">예상 총 세금</p>
+        <p class="text-xl font-bold text-on-surface">${fmtW(tax.totalTax)}</p>
+      </div>
+      <div class="bg-tertiary-container/30 rounded-lg p-6">
+        <p class="text-label-md text-on-surface-variant mb-2">세후 순수입</p>
+        <p class="text-xl font-bold text-tertiary">${fmtW(tax.netIncome)}</p>
+      </div>
+    </section>
+
+    <!-- Monthly Chart -->
+    <section class="bg-surface-container-lowest rounded-lg p-8">
+      <h4 class="text-title-lg mb-8">월별 수입/지출 추이</h4>
+      <div class="flex items-end gap-2 h-64">
+        ${monthlyData.map((m, i) => {
+          const incH = maxVal > 0 ? (m.income / maxVal * 200) : 0;
+          const expH = maxVal > 0 ? (m.expense / maxVal * 200) : 0;
+          return `
+          <div class="flex-1 flex flex-col items-center gap-1 group/bar relative cursor-default">
+            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-on-surface text-surface text-[10px] font-semibold px-2.5 py-1.5 rounded-md whitespace-nowrap opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg"
+              >${m.income > 0 || m.expense > 0 ? `수입 ${fmtW(m.income)}<br>지출 ${fmtW(m.expense)}` : '데이터 없음'}</div>
+            <div class="flex gap-0.5 items-end" style="height: 200px">
+              <div class="w-3 bg-primary/70 rounded-t transition-all duration-300 group-hover/bar:bg-primary" style="height: ${Math.max(incH, incH > 0 ? 4 : 0)}px"></div>
+              <div class="w-3 bg-error/40 rounded-t transition-all duration-300 group-hover/bar:bg-error/70" style="height: ${Math.max(expH, expH > 0 ? 4 : 0)}px"></div>
+            </div>
+            <span class="text-[10px] text-on-surface-variant mt-2">${i+1}월</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="flex justify-center gap-6 mt-6">
+        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-primary/70"></div><span class="text-xs text-on-surface-variant">수입</span></div>
+        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-error/40"></div><span class="text-xs text-on-surface-variant">지출</span></div>
+      </div>
+    </section>
+
+    <!-- Tax Schedule -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="bg-surface-container-lowest rounded-lg p-8">
+        <h4 class="text-title-lg mb-6">세금 납부 일정</h4>
+        <div class="space-y-4">
+          <div class="flex items-center gap-4 p-4 bg-primary-container/5 rounded-lg">
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined icon-filled">event</span>
+            </div>
+            <div class="flex-1">
+              <p class="font-semibold text-sm">종합소득세 신고·납부</p>
+              <p class="text-xs text-on-surface-variant">${year + 1}년 5월 1일 ~ 5월 31일</p>
+            </div>
+            <span class="text-sm font-bold text-primary">${fmtW(Math.round(tax.incomeTax) + tax.localTax)}</span>
+          </div>
+          <div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-lg">
+            <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+              <span class="material-symbols-outlined">schedule</span>
+            </div>
+            <div class="flex-1">
+              <p class="font-semibold text-sm">중간예납 (1/2)</p>
+              <p class="text-xs text-on-surface-variant">${year}년 11월 30일까지</p>
+            </div>
+            <span class="text-sm font-bold text-secondary">${fmtW(Math.round((Math.round(tax.incomeTax) + tax.localTax) / 2))}</span>
+          </div>
+          <div class="flex items-center gap-4 p-4 bg-tertiary-container/20 rounded-lg">
+            <div class="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary">
+              <span class="material-symbols-outlined">health_and_safety</span>
+            </div>
+            <div class="flex-1">
+              <p class="font-semibold text-sm">4대보험 (연간)</p>
+              <p class="text-xs text-on-surface-variant">매월 납부</p>
+            </div>
+            <span class="text-sm font-bold text-tertiary">${fmtW(tax.totalSocialIns)}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export -->
+      <div class="bg-surface-container-lowest rounded-lg p-8 flex flex-col">
+        <h4 class="text-title-lg mb-6">데이터 내보내기 / 가져오기</h4>
+        <p class="text-sm text-on-surface-variant mb-8 flex-1">${year}년 거래 내역을 CSV로 내보내거나, 외부 CSV 파일을 가져올 수 있습니다.</p>
+        <div class="space-y-3">
+          <button onclick="exportCSV()" class="w-full bg-primary text-on-primary px-6 py-4 rounded-full flex items-center justify-center gap-2 text-sm font-semibold hover:scale-[1.02] transition-transform shadow-md shadow-primary/20">
+            <span class="material-symbols-outlined">download</span>CSV 내보내기
+          </button>
+          <button onclick="importCSV()" class="w-full bg-surface-container text-on-surface-variant px-6 py-4 rounded-full flex items-center justify-center gap-2 text-sm font-semibold hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined">upload</span>CSV 가져오기
+          </button>
+          <div class="bg-tertiary-container/20 rounded-lg p-4 mt-4">
+            <p class="text-xs text-on-surface-variant flex items-start gap-2">
+              <span class="material-symbols-outlined text-tertiary text-base mt-0.5">lightbulb</span>
+              <span>종합소득세 신고 시 필요한 자료를 미리 정리해두면 편리합니다. 5월 신고 전에 데이터를 꼭 백업하세요.</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function exportCSV() {
+  const txs = getYearTransactions(reportYearFilter);
+  if (txs.length === 0) { showToast('내보낼 거래 내역이 없습니다.', 'error'); return; }
+
+  const header = '날짜,유형,설명,클라이언트,금액,원천징수여부,원천징수액';
+  const rows = txs.map(t => {
+    const wh = t.withholding ? Math.round(t.amount * 0.033) : 0;
+    return `${t.date},${t.type==='income'?'수입':'지출'},"${(t.description||'').replace(/"/g,'""')}","${(t.client||'').replace(/"/g,'""')}",${t.amount},${t.withholding?'Y':'N'},${wh}`;
+  });
+  const csv = [header, ...rows].join('\n');
+
+  if (window.electronAPI) {
+    window.electronAPI.saveCSV(csv).then(ok => { if (ok) showToast('CSV 파일이 저장되었습니다.', 'success'); });
+  } else {
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `ledgerly_${reportYearFilter}.csv`;
+    a.click();
+  }
+}
+
+function importCSV() {
+  async function doImport(csvText) {
+    if (!csvText) return;
+    const lines = csvText.replace(/^\uFEFF/, '').split('\n').filter(l => l.trim());
+    if (lines.length < 2) { showToast('CSV 파일에 데이터가 없습니다.', 'error'); return; }
+    // Parse header
+    const header = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    const dateIdx = header.findIndex(h => /날짜|date|결제일/i.test(h));
+    const typeIdx = header.findIndex(h => /유형|type/i.test(h));
+    const descIdx = header.findIndex(h => /설명|프로젝트|구매.*항목|description/i.test(h));
+    const clientIdx = header.findIndex(h => /클라이언트|거래처|구매처|client/i.test(h));
+    const amountIdx = header.findIndex(h => /금액|amount|결제/i.test(h));
+    if (dateIdx === -1 || amountIdx === -1) { showToast('날짜, 금액 열을 찾을 수 없습니다.', 'error'); return; }
+    let count = 0;
+    for (let i = 1; i < lines.length; i++) {
+      const cols = [];
+      let cur = '', inQuote = false;
+      for (const ch of lines[i]) {
+        if (ch === '"') { inQuote = !inQuote; }
+        else if (ch === ',' && !inQuote) { cols.push(cur.trim()); cur = ''; }
+        else { cur += ch; }
+      }
+      cols.push(cur.trim());
+      const rawAmt = (cols[amountIdx]||'').replace(/[^0-9]/g, '');
+      const amount = parseInt(rawAmt) || 0;
+      const typeVal = typeIdx >= 0 ? cols[typeIdx] : '';
+      const type = /지출|expense/i.test(typeVal) ? 'expense' : 'income';
+      const date = (cols[dateIdx]||'').replace(/\./g, '-').replace(/(\d{4})-(\d{1,2})-(\d{1,2}).*/, (_, y, m, d) => `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`);
+      if (!date) continue;
+      addTransaction({
+        date, type, amount, actualAmount: amount,
+        project: descIdx >= 0 ? cols[descIdx]||'' : '',
+        description: descIdx >= 0 ? cols[descIdx]||'' : '',
+        client: clientIdx >= 0 ? cols[clientIdx]||'' : '',
+        workStart: '', workEnd: '', taxType: 'none', withholding: false, unreported: false,
+        paymentStatus: 'confirmed', notes: 'CSV 가져오기', tags: [], category: 'general'
+      });
+      count++;
+    }
+    showToast(`${count}건의 거래를 가져왔습니다.`, 'success');
+    renderView(currentView);
+  }
+  if (window.electronAPI?.openCSV) {
+    window.electronAPI.openCSV().then(doImport);
+  } else {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.csv';
+    input.onchange = () => { const f = input.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => doImport(r.result); r.readAsText(f, 'utf-8'); };
+    input.click();
+  }
+}
+
+// ============================================================
+//  MODALS
+// ============================================================
+function openModal(html) {
+  const content = document.getElementById('modal-content');
+  content.innerHTML = html;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  document.getElementById('modal-overlay').classList.add('flex');
+  const fadeTop = document.getElementById('modal-fade-top');
+  const fadeBot = document.getElementById('modal-fade-bot');
+  function updateFades() {
+    if (!fadeTop || !fadeBot) return;
+    fadeTop.style.opacity = content.scrollTop > 8 ? '1' : '0';
+    fadeBot.style.opacity = content.scrollHeight - content.scrollTop - content.clientHeight > 8 ? '1' : '0';
+  }
+  content.addEventListener('scroll', updateFades);
+  requestAnimationFrame(updateFades);
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+  document.getElementById('modal-overlay').classList.remove('flex');
+  editingTxId = null;
+}
+
+// ── Toast ──────────────────────────────────────────────
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  const styles = {
+    success: 'background:#525e55;color:#e9f6ea',
+    error:   'background:#b31b25;color:#ffefee',
+    info:    'background:#2d2f2f;color:#f6f6f6'
+  };
+  toast.style.cssText = `${styles[type]||styles.info};padding:10px 20px;border-radius:9999px;font-size:0.8rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.18);pointer-events:auto;white-space:nowrap;`;
+  toast.className = 'toast-item';
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.transition = 'opacity 0.3s'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2800);
+}
+
+// ── Confirm dialog ─────────────────────────────────────
+let _confirmCb = null;
+function showConfirm(message, onConfirm, { okLabel = '삭제', okDanger = true } = {}) {
+  _confirmCb = onConfirm;
+  document.getElementById('confirm-message').textContent = message;
+  const okBtn = document.getElementById('confirm-ok-btn');
+  okBtn.textContent = okLabel;
+  okBtn.style.background = okDanger ? '#b31b25' : '#005da7';
+  okBtn.style.color = okDanger ? '#ffefee' : '#eef3ff';
+  const d = document.getElementById('confirm-dialog');
+  d.classList.remove('hidden'); d.classList.add('flex');
+}
+function _closeConfirm() {
+  document.getElementById('confirm-dialog').classList.add('hidden');
+  document.getElementById('confirm-dialog').classList.remove('flex');
+  _confirmCb = null;
+}
+document.getElementById('confirm-ok-btn').addEventListener('click', () => { const cb = _confirmCb; _closeConfirm(); if (cb) cb(); });
+document.getElementById('confirm-cancel-btn').addEventListener('click', _closeConfirm);
+let _modalMouseDownTarget = null;
+document.getElementById('modal-overlay').addEventListener('mousedown', e => { _modalMouseDownTarget = e.target; });
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay') && _modalMouseDownTarget === document.getElementById('modal-overlay')) closeModal();
+});
+
+// --- Add Transaction Modal ---
+function openAddTransaction() {
+  const today = new Date().toISOString().slice(0, 10);
+  openModal(`
+    <h3 class="text-title-lg mb-6">새 거래 추가</h3>
+    <form id="add-tx-form" class="space-y-5">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-label-md text-on-surface-variant block mb-1.5">유형</label>
+          <select id="tx-type" class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary/30">
+            <option value="income">수입</option>
+            <option value="expense">지출</option>
+          </select>
+        </div>
+        <div>
+          <label id="date-label" class="text-label-md text-on-surface-variant block mb-1.5">날짜 (입금일)</label>
+          <div class="cal-trigger w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm flex items-center gap-2" data-cal="tx-date" onclick="datePicker.show('tx-date', this)">
+            <span class="material-symbols-outlined text-on-surface-variant" style="font-size:17px">calendar_today</span>
+            <span class="cal-display flex-1 text-on-surface">${fmtDateKo(today)}</span>
+          </div>
+          <input type="hidden" id="tx-date" value="${today}">
+        </div>
+      </div>
+      <div id="work-period-section">
+        <label class="text-label-md text-on-surface-variant block mb-1.5">작업 기간</label>
+        <div class="grid gap-2" style="grid-template-columns: 1fr auto 1fr; align-items: center;">
+          <div>
+            <div class="cal-trigger w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm flex items-center gap-2" data-cal="tx-work-start" onclick="datePicker.show('tx-work-start', this)">
+              <span class="material-symbols-outlined text-on-surface-variant" style="font-size:17px">event</span>
+              <span class="cal-display flex-1 text-on-surface-variant">시작일 선택</span>
+            </div>
+            <input type="hidden" id="tx-work-start">
+          </div>
+          <span class="text-on-surface-variant text-sm font-light px-1">~</span>
+          <div>
+            <div class="cal-trigger w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm flex items-center gap-2" data-cal="tx-work-end" onclick="datePicker.show('tx-work-end', this)">
+              <span class="material-symbols-outlined text-on-surface-variant" style="font-size:17px">event</span>
+              <span class="cal-display flex-1 text-on-surface-variant">종료일 (선택)</span>
+            </div>
+            <input type="hidden" id="tx-work-end">
+          </div>
+        </div>
+        <p class="text-[11px] text-on-surface-variant mt-1.5">종료일은 선택사항입니다.</p>
+      </div>
+      <div>
+        <label id="project-label" class="text-label-md text-on-surface-variant block mb-1.5">프로젝트명</label>
+        <input type="text" id="tx-project" placeholder="프로젝트명" class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary/30"/>
+      </div>
+      <div>
+        <label class="text-label-md text-on-surface-variant block mb-1.5">태그</label>
+        <div id="tx-tag-list" class="pill-group flex-wrap"></div>
+        <div class="flex items-center gap-2 mt-2" id="tx-tag-input-row">
+          <input type="text" id="tx-new-tag" placeholder="새 태그 입력 후 Enter" class="flex-1 bg-surface-container-low rounded-full px-3 py-1.5 text-xs border-none focus:ring-2 focus:ring-primary/30" style="min-width:0"/>
+          <button type="button" id="tx-add-tag-btn" class="text-xs text-primary font-semibold px-3 py-1.5 rounded-full hover:bg-primary/10 transition-colors whitespace-nowrap">+ 추가</button>
+        </div>
+      </div>
+      <div>
+        <label id="client-label" class="text-label-md text-on-surface-variant block mb-1.5">클라이언트 / 거래처</label>
+        <input type="text" id="tx-client" placeholder="예: ABC 스튜디오" class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary/30"/>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label id="amount-label" class="text-label-md text-on-surface-variant block mb-1.5">세전 금액 (원)</label>
+          <input type="text" id="tx-amount" placeholder="0" inputmode="numeric" class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary/30" oninput="formatAmountInput(this)"/>
+        </div>
+        <div id="actual-amount-section">
+          <label class="text-label-md text-on-surface-variant block mb-1.5">실제 입금액 (선택)</label>
+          <input type="text" id="tx-actual" placeholder="세금 유형 선택 시 자동 계산" inputmode="numeric" class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary/30" oninput="formatAmountInput(this)"/>
+        </div>
+      </div>
+      <!-- 지출 전용 필드 -->
+      <div id="expense-fields" style="display:none" class="space-y-4">
+        <div>
+          <label class="text-label-md text-on-surface-variant block mb-1.5">분류</label>
+          <input type="text" id="tx-expense-category" placeholder="예: 장비 구매, 소프트웨어" class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary/30"/>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-label-md text-on-surface-variant block mb-1.5">결제 수단</label>
+            <input type="text" id="tx-payment-method" placeholder="예: 체크카드" class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary/30"/>
+          </div>
+          <div>
+            <label class="text-label-md text-on-surface-variant block mb-1.5">증빙 여부 (URL)</label>
+            <input type="text" id="tx-proof-url" placeholder="https://..." class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary/30"/>
+          </div>
+        </div>
+      </div>
+      <div id="income-fields">
+        <div class="mb-4">
+          <label class="text-label-md text-on-surface-variant block mb-2">세금 유형</label>
+          <div class="pill-group" id="tax-type-group">
+            <button type="button" class="pill-opt sel-gray" data-value="none">없음</button>
+            <button type="button" class="pill-opt" data-value="withholding_3.3">3.3% 원천징수</button>
+            <button type="button" class="pill-opt" data-value="unreported">세금미신고</button>
+            <button type="button" class="pill-opt" data-value="exception">예외</button>
+          </div>
+        </div>
+        <div>
+          <label class="text-label-md text-on-surface-variant block mb-2">입금 상태</label>
+          <div class="pill-group" id="payment-status-group">
+            <button type="button" class="pill-opt" data-value="pending">미확정</button>
+            <button type="button" class="pill-opt" data-value="unconfirmed">미확인</button>
+            <button type="button" class="pill-opt sel-green" data-value="confirmed">확인완료</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <label class="text-label-md text-on-surface-variant block mb-1.5">비고</label>
+        <textarea id="tx-notes" rows="4" placeholder="메모를 입력하세요" class="w-full bg-surface-container-low rounded-lg px-5 py-4 text-sm border-none focus:ring-2 focus:ring-primary/30 resize-none"></textarea>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="closeModal()" class="flex-1 py-3 rounded-full bg-surface-container text-on-surface-variant font-semibold text-sm hover:bg-surface-container-high transition-colors">취소</button>
+        <button type="submit" class="flex-1 py-3 rounded-full bg-primary text-on-primary font-semibold text-sm hover:scale-[1.02] transition-transform shadow-md shadow-primary/20">저장</button>
+      </div>
+    </form>
+  `);
+
+  // 실제 입금액 자동 계산
+  let actualManuallyEdited = false;
+  function calcActualAmount(taxType, rawAmount) {
+    const amt = parseInt(rawAmount) || 0;
+    if (taxType === 'withholding_3.3') return Math.round(amt * 0.967);
+    return amt;
+  }
+  function updateActualField() {
+    if (actualManuallyEdited) return;
+    const taxType = document.querySelector('#tax-type-group .pill-opt.sel-blue, #tax-type-group .pill-opt.sel-gray')?.dataset.value || 'none';
+    const rawAmount = document.getElementById('tx-amount').value.replace(/[^0-9]/g, '');
+    const actual = calcActualAmount(taxType, rawAmount);
+    const el = document.getElementById('tx-actual');
+    el.value = actual > 0 ? new Intl.NumberFormat('ko-KR').format(actual) : '';
+  }
+  document.getElementById('tx-actual').addEventListener('input', () => { actualManuallyEdited = true; });
+  document.getElementById('tx-amount').addEventListener('input', updateActualField);
+
+  // Pill group helper
+  function initPillGroup(groupId, defaultValue) {
+    const group = document.getElementById(groupId);
+    group.querySelectorAll('.pill-opt').forEach(btn => {
+      if (btn.dataset.value === defaultValue) {
+        btn.classList.add(btn.dataset.selClass || (groupId === 'tax-type-group' ? 'sel-gray' : 'sel-green'));
+      }
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.pill-opt').forEach(b => b.classList.remove('sel-blue','sel-green','sel-warn','sel-gray'));
+        const cls = groupId === 'payment-status-group'
+          ? (btn.dataset.value === 'confirmed' ? 'sel-green' : btn.dataset.value === 'unconfirmed' ? 'sel-warn' : 'sel-gray')
+          : (btn.dataset.value === 'none' ? 'sel-gray' : btn.dataset.value === 'exception' ? 'sel-gray' : 'sel-blue');
+        btn.classList.add(cls);
+        if (groupId === 'tax-type-group') updateActualField();
+      });
+    });
+  }
+  initPillGroup('tax-type-group', 'none');
+  initPillGroup('payment-status-group', 'confirmed');
+
+  // Tag system
+  let selectedTags = [];
+  if (_pendingEditTags !== null) { selectedTags = [..._pendingEditTags]; _pendingEditTags = null; }
+  let dragSrcIdx = null;
+  function renderTagList() {
+    const allTags = getTags();
+    const container = document.getElementById('tx-tag-list');
+    container.innerHTML = '';
+    allTags.forEach((tag, i) => {
+      const wrap = document.createElement('div');
+      const isSel = selectedTags.includes(tag);
+      wrap.className = 'pill-opt relative flex items-center gap-1 cursor-pointer select-none' + (isSel ? ' sel-blue' : '');
+      wrap.style.paddingRight = '20px';
+      wrap.draggable = true;
+      // label (click to toggle selection)
+      const label = document.createElement('span');
+      label.textContent = tag;
+      label.onclick = () => {
+        isSel ? selectedTags.splice(selectedTags.indexOf(tag), 1) : selectedTags.push(tag);
+        renderTagList();
+      };
+      // delete × button
+      const del = document.createElement('span');
+      del.textContent = '×';
+      del.title = '태그 삭제';
+      del.style.cssText = 'position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11px;line-height:1;cursor:pointer;opacity:0.5;transition:opacity 0.15s;';
+      del.onmouseenter = () => { del.style.opacity = '1'; };
+      del.onmouseleave = () => { del.style.opacity = '0.5'; };
+      del.onclick = (e) => {
+        e.stopPropagation();
+        const tags = getTags();
+        tags.splice(tags.indexOf(tag), 1);
+        saveTags(tags);
+        selectedTags = selectedTags.filter(t => t !== tag);
+        renderTagList();
+      };
+      // drag events
+      wrap.addEventListener('dragstart', (e) => { dragSrcIdx = i; e.dataTransfer.effectAllowed = 'move'; setTimeout(() => { wrap.style.opacity = '0.4'; }, 0); });
+      wrap.addEventListener('dragend', () => { wrap.style.opacity = '1'; dragSrcIdx = null; });
+      wrap.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; wrap.style.outline = '2px solid #005da7'; wrap.style.outlineOffset = '2px'; });
+      wrap.addEventListener('dragleave', () => { wrap.style.outline = ''; wrap.style.outlineOffset = ''; });
+      wrap.addEventListener('drop', (e) => {
+        e.preventDefault(); wrap.style.outline = ''; wrap.style.outlineOffset = '';
+        if (dragSrcIdx === null || dragSrcIdx === i) return;
+        const tags = getTags();
+        const [moved] = tags.splice(dragSrcIdx, 1);
+        tags.splice(i, 0, moved);
+        saveTags(tags);
+        dragSrcIdx = null;
+        renderTagList();
+      });
+      wrap.appendChild(label);
+      wrap.appendChild(del);
+      container.appendChild(wrap);
+    });
+  }
+  renderTagList();
+  function addNewTag() {
+    const input = document.getElementById('tx-new-tag');
+    const val = input.value.trim();
+    if (!val) return;
+    const tags = getTags();
+    if (!tags.includes(val)) { tags.push(val); saveTags(tags); }
+    if (!selectedTags.includes(val)) selectedTags.push(val);
+    input.value = '';
+    renderTagList();
+  }
+  document.getElementById('tx-new-tag').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addNewTag(); } });
+  document.getElementById('tx-add-tag-btn').addEventListener('click', addNewTag);
+
+  function applyTypeMode(type) {
+    const isExpense = type === 'expense';
+    document.getElementById('income-fields').style.display = isExpense ? 'none' : 'block';
+    document.getElementById('expense-fields').style.display = isExpense ? 'block' : 'none';
+    document.getElementById('work-period-section').style.display = isExpense ? 'none' : 'block';
+    document.getElementById('actual-amount-section').style.display = isExpense ? 'none' : 'block';
+    document.getElementById('date-label').textContent = isExpense ? '결제일' : '날짜 (입금일)';
+    document.getElementById('project-label').textContent = isExpense ? '구매 항목' : '프로젝트명';
+    document.getElementById('client-label').textContent = isExpense ? '구매처 (출처)' : '클라이언트 / 거래처';
+    document.getElementById('amount-label').textContent = isExpense ? '결제 금액 (원)' : '세전 금액 (원)';
+    document.getElementById('tx-project').placeholder = isExpense ? '예: Adobe 구독, 노트북' : '프로젝트명';
+    document.getElementById('tx-client').placeholder = isExpense ? '예: https://example.com' : '예: ABC 스튜디오';
+  }
+  document.getElementById('tx-type').addEventListener('change', e => applyTypeMode(e.target.value));
+
+  document.getElementById('add-tx-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const rawAmount = document.getElementById('tx-amount').value.replace(/[^0-9]/g, '');
+    const amount = rawAmount === '' ? null : parseInt(rawAmount);
+    if (amount === null || isNaN(amount) || amount < 0) { showToast('금액을 입력해주세요.', 'error'); return; }
+    const txTypeVal = document.getElementById('tx-type').value;
+    const workStart = document.getElementById('tx-work-start').value;
+    if (txTypeVal === 'income' && !workStart) { showToast('작업 시작일을 입력해주세요.', 'error'); return; }
+    const rawActual = document.getElementById('tx-actual').value.replace(/[^0-9]/g, '');
+    const actualAmount = parseInt(rawActual) || 0;
+    const taxType = document.querySelector('#tax-type-group .pill-opt.sel-blue, #tax-type-group .pill-opt.sel-gray')?.dataset.value || 'none';
+    const paymentStatus = document.querySelector('#payment-status-group .pill-opt.sel-green, #payment-status-group .pill-opt.sel-warn, #payment-status-group .pill-opt.sel-gray')?.dataset.value || 'confirmed';
+    const project = document.getElementById('tx-project').value.trim();
+
+    const txData = {
+      date: document.getElementById('tx-date').value,
+      workStart: txTypeVal === 'income' ? workStart : '',
+      workEnd: txTypeVal === 'income' ? (document.getElementById('tx-work-end').value || '') : '',
+      type: txTypeVal,
+      amount,
+      actualAmount: txTypeVal === 'income' ? actualAmount : amount,
+      project,
+      description: project,
+      client: document.getElementById('tx-client').value.trim(),
+      taxType: txTypeVal === 'income' ? taxType : 'none',
+      withholding: txTypeVal === 'income' && taxType === 'withholding_3.3',
+      unreported: txTypeVal === 'income' && taxType === 'unreported',
+      paymentStatus: txTypeVal === 'income' ? paymentStatus : 'confirmed',
+      expenseCategory: document.getElementById('tx-expense-category')?.value.trim() || '',
+      paymentMethod: document.getElementById('tx-payment-method')?.value.trim() || '',
+      proofUrl: document.getElementById('tx-proof-url')?.value.trim() || '',
+      notes: document.getElementById('tx-notes').value.trim(),
+      tags: [...selectedTags],
+      category: 'general'
+    };
+    if (editingTxId) {
+      const txs = getTransactions();
+      const idx = txs.findIndex(t => t.id === editingTxId);
+      if (idx !== -1) { txs[idx] = { ...txs[idx], ...txData }; saveTransactions(txs); }
+      editingTxId = null;
+    } else {
+      addTransaction(txData);
+    }
+    closeModal();
+    renderView(currentView);
+  });
+}
+
+function formatAmountInput(el) {
+  const raw = el.value.replace(/[^0-9]/g, '');
+  if (raw) {
+    el.value = new Intl.NumberFormat('ko-KR').format(parseInt(raw));
+  }
+}
+
+// --- Settings Modal ---
+function openSettings() {
+  const s = getSettings();
+  openModal(`
+    <h3 class="text-title-lg mb-6">설정</h3>
+    <form id="settings-form" class="space-y-5">
+      <div>
+        <label class="text-label-md text-on-surface-variant block mb-1.5">이름</label>
+        <input type="text" id="set-name" value="${escapeHtml(s.name)}" placeholder="이름" class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary/30"/>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-label-md text-on-surface-variant block mb-1.5">귀속연도</label>
+          <input type="hidden" id="set-year" value="${s.year}">
+          <div class="flex items-center gap-1 bg-surface-container-low rounded-lg p-1">
+            <button type="button" class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-surface-container transition-colors text-on-surface-variant" onclick="const v=parseInt(document.getElementById('set-year').value)-1;document.getElementById('set-year').value=v;document.getElementById('set-year-label').textContent=v+'년';">
+              <span class="material-symbols-outlined text-sm">chevron_left</span>
+            </button>
+            <span id="set-year-label" class="flex-1 text-center text-sm font-bold text-on-surface">${s.year}년</span>
+            <button type="button" class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-surface-container transition-colors text-on-surface-variant" onclick="const v=parseInt(document.getElementById('set-year').value)+1;document.getElementById('set-year').value=v;document.getElementById('set-year-label').textContent=v+'년';">
+              <span class="material-symbols-outlined text-sm">chevron_right</span>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="text-label-md text-on-surface-variant block mb-1.5">부양가족 수</label>
+          <input type="number" id="set-dependents" value="${s.dependents}" min="0" max="10" class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary/30"/>
+        </div>
+      </div>
+      <div>
+        <label class="text-label-md text-on-surface-variant block mb-1.5">업종</label>
+        <select id="set-business" class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary/30" onchange="document.getElementById('custom-ratio-row').style.display=this.value==='custom'?'block':'none'">
+          ${Object.entries(EXPENSE_RATIOS).map(([k,v]) => `<option value="${k}" ${k===s.businessType?'selected':''}>${v.label} (경비율 ${(v.ratio*100).toFixed(1)}%)</option>`).join('')}
+          <option value="custom" ${'custom'===s.businessType?'selected':''}>직접입력 (경비율 직접입력)</option>
+        </select>
+      </div>
+      <div id="custom-ratio-row" style="display:${s.businessType==='custom'?'block':'none'}">
+        <label class="text-label-md text-on-surface-variant block mb-1.5">경비율 (%)</label>
+        <input type="number" id="set-custom-ratio" value="${((s.customExpenseRatio||0.641)*100).toFixed(1)}" min="0" max="100" step="0.1" class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary/30" placeholder="0 ~ 100"/>
+      </div>
+      <div>
+        <label class="text-label-md text-on-surface-variant block mb-1.5">경비 처리 방식</label>
+        <select id="set-expense-method" class="w-full bg-surface-container-low rounded-lg px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary/30">
+          <option value="simple_ratio" ${s.expenseMethod==='simple_ratio'?'selected':''}>단순경비율 (자동 계산)</option>
+          <option value="actual" ${s.expenseMethod==='actual'?'selected':''}>실제 경비 (직접 입력한 지출 합산)</option>
+        </select>
+      </div>
+      <div class="bg-tertiary-container/20 rounded-lg p-4">
+        <p class="text-xs text-on-surface-variant flex items-start gap-2">
+          <span class="material-symbols-outlined text-tertiary text-base mt-0.5">info</span>
+          <span><strong>단순경비율</strong>: 국세청이 정한 업종별 경비 비율로 자동 계산합니다. 연 수입 3,600만원 이하 프리랜서에게 적용됩니다.<br/><strong>실제 경비</strong>: 직접 입력한 지출 내역을 경비로 사용합니다.</span>
+        </p>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="closeModal()" class="flex-1 py-3 rounded-full bg-surface-container text-on-surface-variant font-semibold text-sm hover:bg-surface-container-high transition-colors">취소</button>
+        <button type="submit" class="flex-1 py-3 rounded-full bg-primary text-on-primary font-semibold text-sm hover:scale-[1.02] transition-transform shadow-md shadow-primary/20">저장</button>
+      </div>
+    </form>
+  `);
+
+  document.getElementById('settings-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const bt = document.getElementById('set-business').value;
+    const customRatioInput = parseFloat(document.getElementById('set-custom-ratio').value) / 100;
+    saveSettings({
+      name: document.getElementById('set-name').value.trim(),
+      year: parseInt(document.getElementById('set-year').value),
+      businessType: bt,
+      expenseMethod: document.getElementById('set-expense-method').value,
+      customExpenseRatio: bt === 'custom' ? (isNaN(customRatioInput) ? 0.641 : Math.min(Math.max(customRatioInput, 0), 1)) : (EXPENSE_RATIOS[bt]?.ratio || 0.641),
+      dependents: parseInt(document.getElementById('set-dependents').value) || 0,
+      taxToggles: getSettings().taxToggles || { pension: true, health: true, longTermCare: true }
+    });
+    closeModal();
+    navigate(currentView);
+  });
+}
+
+// ============================================================
+//  SECURITY HELPER
+// ============================================================
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ============================================================
+//  SEED DATA (spreadsheet import)
+// ============================================================
+function cleanupSeedData() {
+  if (localStorage.getItem('ledgerly_seed_cleaned') === 'v1') return;
+  const seedKeys = [
+    '미츄(모구구)|300000','최토(F.Laon)|830000','라벤|100000','뭉|200000','카요|300000',
+    'Vrecord(타루)|300000','시나맨|2208000','Vrecord(MEU)|3000000','뭉|100000',
+    '고단씨|1294000','독고혜지|786000','시나맨(만디)|0','강풍|0',
+    '시나맨|24000000','원밀준비|50000','세이민(MEU)|50000'
+  ];
+  const txs = getTransactions();
+  const cleaned = txs.filter(t => !seedKeys.includes(`${t.client}|${t.amount}`));
+  saveTransactions(cleaned);
+  localStorage.setItem('ledgerly_seed_cleaned', 'v1');
+}
+
+function initSeedData() {
+  if (localStorage.getItem('ledgerly_seeded') === 'sheet_v1') return;
+
+  // Ensure tags exist
+  const tags = getTags();
+  ['모션 클린업', 'VRC 뮤비 촬영', '리타겟팅'].forEach(t => { if (!tags.includes(t)) tags.push(t); });
+  saveTags(tags);
+
+  const rows = [
+    // ── 2025 ──
+    { ws:'2025-03-21', we:'2025-03-28', client:'미츄(모구구)',   tag:'모션 클린업',  amt:300000,   actual:290100,   tax:'withholding_3.3', st:'confirmed',   notes:'SC제일 은행으로 받음' },
+    { ws:'2025-06-26', we:'',           client:'최토(F.Laon)',   tag:'모션 클린업',  amt:830000,   actual:802610,   tax:'unreported',      st:'confirmed',   notes:'작업 기간이 기억나지 않아 완료일 기준으로 작성' },
+    { ws:'2025-07-18', we:'',           client:'라벤',           tag:'VRC 뮤비 촬영',amt:100000,   actual:100000,   tax:'unreported',      st:'confirmed',   notes:'작업 기간이 기억나지 않아 완료일 기준으로 작성 판매용 모션 수정' },
+    { ws:'2025-08-12', we:'2025-08-13', client:'뭉',             tag:'모션 클린업',  amt:200000,   actual:200000,   tax:'unreported',      st:'confirmed',   notes:'판매 링크: https://myong.booth.pm/items/7297629' },
+    { ws:'2025-07-12', we:'2025-07-22', client:'카요',           tag:'모션 클린업',  amt:300000,   actual:290100,   tax:'exception',       st:'confirmed',   notes:'세금신고가 이상하게 되어있었음 3.3%이 아니라 1.65%로 신고되어있음 실제로 신고 되어 있는 금액은 295,050 임' },
+    { ws:'2025-07-01', we:'2025-07-31', client:'Vrecord(타루)',  tag:'모션 클린업',  amt:300000,   actual:290100,   tax:'withholding_3.3', st:'confirmed',   notes:'' },
+    { ws:'2025-08-01', we:'2025-08-23', client:'시나맨',         tag:'모션 클린업',  amt:2208000,  actual:2135140,  tax:'withholding_3.3', st:'confirmed',   notes:'4원 더 입금받음' },
+    { ws:'2025-07-01', we:'2025-07-31', client:'Vrecord(MEU)',   tag:'모션 클린업',  amt:3000000,  actual:2901000,  tax:'withholding_3.3', st:'confirmed',   notes:'' },
+    { ws:'2025-10-17', we:'2025-11-24', client:'뭉',             tag:'모션 클린업',  amt:100000,   actual:100000,   tax:'unreported',      st:'confirmed',   notes:'' },
+    { ws:'2025-01-22', we:'2025-03-01', client:'고단씨',         tag:'모션 클린업',  amt:1294000,  actual:500000,   tax:'unreported',      st:'unconfirmed', notes:'나눠 정산 받기로함 2025년도 11월 1일에 50만원 입금받고 2026년 2월로 입금 주기로 약속은 받음' },
+    { ws:'2025-12-02', we:'2025-12-15', client:'독고혜지',       tag:'모션 클린업',  amt:786000,   actual:786000,   tax:'unreported',      st:'unconfirmed', notes:'2026년도 1월 정산 50만원, 2월 정산 28만 6천원' },
+    // ── 2026 ──
+    { ws:'2026-02-04', we:'2026-02-21', client:'시나맨(만디)',   tag:'모션 클린업',  amt:0,        actual:0,        tax:'exception',       st:'confirmed',   notes:'' },
+    { ws:'2026-02-21', we:'',           client:'강풍',           tag:'모션 클린업',  amt:0,        actual:0,        tax:'exception',       st:'confirmed',   notes:'아직 확정난거 없음' },
+    { ws:'2026-03-31', we:'',           client:'시나맨',         tag:'모션 클린업',  amt:24000000, actual:0,        tax:'withholding_3.3', st:'unconfirmed', notes:'아직 확정난거 아님 국가 자원 사업 붙으면 시작 떨어지면 지워짐' },
+    { ws:'2026-03-03', we:'',           client:'원밀준비',       tag:'리타겟팅',     amt:50000,    actual:50000,    tax:'unreported',      st:'confirmed',   notes:'2026.03.07 입금 완료', date:'2026-03-07' },
+    { ws:'2026-03-16', we:'2026-04-15', client:'세이민(MEU)',    tag:'모션 클린업',  amt:50000,    actual:0,        tax:'withholding_3.3', st:'unconfirmed', notes:'' },
+  ];
+
+  rows.forEach(r => {
+    const date = r.date || r.we || r.ws;
+    addTransaction({
+      workStart: r.ws, workEnd: r.we, date,
+      client: r.client, project: r.client, description: r.client,
+      type: 'income', amount: r.amt, actualAmount: r.actual,
+      taxType: r.tax, withholding: r.tax === 'withholding_3.3', unreported: r.tax === 'unreported',
+      paymentStatus: r.st, tags: [r.tag], notes: r.notes, category: 'general'
+    });
+  });
+
+  localStorage.setItem('ledgerly_seeded', 'sheet_v1');
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  navigate('dashboard');
+});
+</script>
+</body>
+</html>
