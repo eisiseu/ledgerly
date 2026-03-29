@@ -68,6 +68,33 @@ ipcMain.handle('open-csv', async () => {
   return null;
 });
 
+// JSON 백업 저장
+ipcMain.handle('save-json', async (event, jsonContent) => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    title: '전체 백업 저장',
+    defaultPath: `ledgerly_backup_${new Date().toISOString().slice(0, 10)}.json`,
+    filters: [{ name: 'JSON Files', extensions: ['json'] }]
+  });
+  if (!result.canceled && result.filePath) {
+    fs.writeFileSync(result.filePath, jsonContent, 'utf-8');
+    return true;
+  }
+  return false;
+});
+
+// JSON 백업 읽기
+ipcMain.handle('open-json', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: '백업 파일 가져오기',
+    filters: [{ name: 'JSON Files', extensions: ['json'] }],
+    properties: ['openFile']
+  });
+  if (!result.canceled && result.filePaths.length > 0) {
+    return fs.readFileSync(result.filePaths[0], 'utf-8');
+  }
+  return null;
+});
+
 // 앱 단일 인스턴스 잠금 — 두 번째 실행 시 기존 창 포커스
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {

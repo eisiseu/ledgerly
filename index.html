@@ -1140,7 +1140,7 @@ function renderReports(el) {
       <!-- Export -->
       <div class="bg-surface-container-lowest rounded-lg p-8 flex flex-col">
         <h4 class="text-title-lg mb-6">데이터 내보내기 / 가져오기</h4>
-        <p class="text-sm text-on-surface-variant mb-8 flex-1">${year}년 거래 내역을 CSV로 내보내거나, 외부 CSV 파일을 가져올 수 있습니다.</p>
+        <p class="text-sm text-on-surface-variant mb-4 flex-1">${year}년 거래 내역을 CSV로 내보내거나, 외부 CSV 파일을 가져올 수 있습니다.</p>
         <div class="space-y-3">
           <button onclick="exportCSV()" class="w-full bg-primary text-on-primary px-6 py-4 rounded-full flex items-center justify-center gap-2 text-sm font-semibold hover:scale-[1.02] transition-transform shadow-md shadow-primary/20">
             <span class="material-symbols-outlined">download</span>CSV 내보내기
@@ -1148,10 +1148,20 @@ function renderReports(el) {
           <button onclick="importCSV()" class="w-full bg-surface-container text-on-surface-variant px-6 py-4 rounded-full flex items-center justify-center gap-2 text-sm font-semibold hover:bg-surface-container-high transition-colors">
             <span class="material-symbols-outlined">upload</span>CSV 가져오기
           </button>
+        </div>
+        <div class="border-t border-outline-variant my-6"></div>
+        <p class="text-sm text-on-surface-variant mb-4">거래내역 + 태그 + 설정을 모두 포함한 전체 백업입니다.</p>
+        <div class="space-y-3">
+          <button onclick="exportBackup()" class="w-full bg-tertiary text-on-tertiary px-6 py-4 rounded-full flex items-center justify-center gap-2 text-sm font-semibold hover:scale-[1.02] transition-transform shadow-md shadow-tertiary/20">
+            <span class="material-symbols-outlined">backup</span>전체 백업 내보내기
+          </button>
+          <button onclick="importBackup()" class="w-full bg-surface-container text-on-surface-variant px-6 py-4 rounded-full flex items-center justify-center gap-2 text-sm font-semibold hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined">restore</span>전체 백업 가져오기
+          </button>
           <div class="bg-tertiary-container/20 rounded-lg p-4 mt-4">
             <p class="text-xs text-on-surface-variant flex items-start gap-2">
               <span class="material-symbols-outlined text-tertiary text-base mt-0.5">lightbulb</span>
-              <span>종합소득세 신고 시 필요한 자료를 미리 정리해두면 편리합니다. 5월 신고 전에 데이터를 꼭 백업하세요.</span>
+              <span>앱을 새로 설치하거나 PC를 이전할 때 전체 백업으로 모든 데이터를 그대로 복원할 수 있습니다.</span>
             </p>
           </div>
         </div>
@@ -1230,6 +1240,51 @@ function importCSV() {
     const input = document.createElement('input');
     input.type = 'file'; input.accept = '.csv';
     input.onchange = () => { const f = input.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => doImport(r.result); r.readAsText(f, 'utf-8'); };
+    input.click();
+  }
+}
+
+function exportBackup() {
+  const backup = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    ledgerly_transactions: localStorage.getItem('ledgerly_transactions'),
+    ledgerly_settings: localStorage.getItem('ledgerly_settings'),
+    ledgerly_tags: localStorage.getItem('ledgerly_tags')
+  };
+  const json = JSON.stringify(backup, null, 2);
+  if (window.electronAPI?.saveJSON) {
+    window.electronAPI.saveJSON(json).then(ok => { if (ok) showToast('전체 백업이 저장되었습니다.', 'success'); });
+  } else {
+    const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `ledgerly_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+  }
+}
+
+function importBackup() {
+  async function doRestore(jsonText) {
+    if (!jsonText) return;
+    let backup;
+    try { backup = JSON.parse(jsonText); } catch { showToast('백업 파일을 읽을 수 없습니다.', 'error'); return; }
+    if (!backup.ledgerly_transactions && !backup.ledgerly_tags && !backup.ledgerly_settings) {
+      showToast('올바른 Ledgerly 백업 파일이 아닙니다.', 'error'); return;
+    }
+    if (!confirm('현재 모든 데이터가 백업 파일로 덮어씌워집니다. 계속하시겠습니까?')) return;
+    if (backup.ledgerly_transactions) localStorage.setItem('ledgerly_transactions', backup.ledgerly_transactions);
+    if (backup.ledgerly_settings) localStorage.setItem('ledgerly_settings', backup.ledgerly_settings);
+    if (backup.ledgerly_tags) localStorage.setItem('ledgerly_tags', backup.ledgerly_tags);
+    showToast('백업을 성공적으로 복원했습니다. 앱을 새로고침합니다.', 'success');
+    setTimeout(() => location.reload(), 1200);
+  }
+  if (window.electronAPI?.openJSON) {
+    window.electronAPI.openJSON().then(doRestore);
+  } else {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json';
+    input.onchange = () => { const f = input.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => doRestore(r.result); r.readAsText(f, 'utf-8'); };
     input.click();
   }
 }

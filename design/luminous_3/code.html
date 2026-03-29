@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ledgerly - 대시보드 (Luminous)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed": "#000c1e",
+              "tertiary": "#525e55",
+              "error-container": "#fb5151",
+              "tertiary-fixed-dim": "#d9e6da",
+              "on-background": "#2d2f2f",
+              "on-tertiary": "#e9f6ea",
+              "inverse-surface": "#0c0f0f",
+              "surface-container": "#e7e8e8",
+              "tertiary-container": "#e7f4e8",
+              "outline-variant": "#acadad",
+              "surface-bright": "#f6f6f6",
+              "primary-dim": "#005192",
+              "primary-container": "#68abff",
+              "surface": "#f6f6f6",
+              "tertiary-dim": "#47524a",
+              "secondary-dim": "#43525a",
+              "inverse-primary": "#68abff",
+              "on-tertiary-fixed-variant": "#5b675e",
+              "surface-container-low": "#f0f1f1",
+              "tertiary-fixed": "#e7f4e8",
+              "outline": "#757777",
+              "surface-container-lowest": "#ffffff",
+              "primary-fixed": "#68abff",
+              "surface-variant": "#dbdddd",
+              "secondary-fixed-dim": "#c8d6e1",
+              "secondary": "#4f5d67",
+              "on-error": "#ffefee",
+              "on-surface-variant": "#5a5c5c",
+              "secondary-fixed": "#d6e5ef",
+              "on-error-container": "#570008",
+              "on-surface": "#2d2f2f",
+              "on-secondary-fixed": "#33414a",
+              "on-secondary-fixed-variant": "#4f5d67",
+              "on-primary": "#eef3ff",
+              "surface-dim": "#d2d5d5",
+              "on-primary-container": "#002b52",
+              "on-primary-fixed-variant": "#003461",
+              "primary": "#005da7",
+              "surface-container-high": "#e1e3e3",
+              "inverse-on-surface": "#9c9d9d",
+              "on-secondary": "#e7f5ff",
+              "secondary-container": "#d6e5ef",
+              "surface-tint": "#005da7",
+              "surface-container-highest": "#dbdddd",
+              "on-tertiary-fixed": "#3f4b42",
+              "on-tertiary-container": "#515d54",
+              "background": "#f6f6f6",
+              "error-dim": "#9f0519",
+              "primary-fixed-dim": "#599ef1",
+              "on-secondary-container": "#46545d",
+              "error": "#b31b25"
+            },
+            fontFamily: {
+              "headline": ["Pretendard", "sans-serif"],
+              "body": ["Pretendard", "sans-serif"],
+              "label": ["Pretendard", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Pretendard', sans-serif; -webkit-font-smoothing: antialiased; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .text-display-lg { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+        .text-headline-md { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.01em; }
+        .text-title-lg { font-size: 1.375rem; font-weight: 600; }
+        .text-label-md { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- SideNavBar (Shared Component) -->
+<aside class="h-screen w-72 flex-col fixed left-0 top-0 flex py-8 space-y-2 bg-white dark:bg-slate-900 font-['Pretendard'] text-sm antialiased z-50">
+<div class="px-8 mb-10">
+<h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Ledgerly</h1>
+<p class="text-xs text-slate-400 mt-1">Financial Sanctuary</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full px-4 py-3 mx-4 font-semibold transition-all flex items-center space-x-3 scale-95 duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-full px-4 py-3 mx-4 transition-all flex items-center space-x-3" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span>Income</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-full px-4 py-3 mx-4 transition-all flex items-center space-x-3" href="#">
+<span class="material-symbols-outlined">calculate</span>
+<span>Tax Calculator</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-full px-4 py-3 mx-4 transition-all flex items-center space-x-3" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span>Reports</span>
+</a>
+</nav>
+<div class="px-8 mt-auto pt-8">
+<div class="flex items-center space-x-3 p-2 rounded-lg bg-surface-container-low">
+<img alt="Freelancer Profile" class="w-8 h-8 rounded-full bg-primary-container/20" data-alt="professional headshot of a smiling creative freelancer in a bright modern studio setting with soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXkewfWLYNIipqobnXU9UwWcMw4T9XNTztnMA-VhaVmCadC3ao97ep9AljVy5wFjhp2qKJwvgT5Emp3fJ-TGSnurbk652EZTNrKJGdr3CYQq3wFubGFbo-Gienap0hQuK2ov5tDd4qCrt5s_XcuhiFWGPoq4ODQ9Lsll8CbbYV7kzVHjTF4RoHj4jMfZm-it1QhylUcGKFjIAlHsjDuJueO4v1mWexhBx8LTkmAF-SoaTwM8K3ecQVXN6P0JSc-rTwWTJt4hWBU7jY"/>
+<div class="flex flex-col">
+<span class="text-xs font-semibold">User Profile</span>
+<span class="text-[10px] text-on-surface-variant">Freelancer Mode</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar (Shared Component) -->
+<header class="fixed top-0 right-0 left-72 h-20 flex items-center justify-between px-10 w-full bg-white/70 backdrop-blur-xl z-40 font-['Pretendard'] text-base font-medium">
+<div class="flex items-center">
+<h2 class="text-headline-md text-on-surface">대시보드 (Luminous)</h2>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-blue-700 font-semibold opacity-80 hover:opacity-100 transition-opacity">Dashboard</button>
+<div class="flex items-center space-x-4">
+<button class="hover:bg-slate-100/50 rounded-full p-2 transition-opacity opacity-80 hover:opacity-100">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<img alt="User Avatar" class="w-9 h-9 rounded-full ring-2 ring-primary-container/20" data-alt="minimalist abstract avatar icon with soft blue and white circular shapes representing professional identity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARpOaR73JAOQmtX_BSgBVTMQ4D71xyGHalHm-tmA9B3NkY6F3WgCooVdAmNKmhIIRglcTqb4fUp5uZGAxMivNzDLVhH7t3pAkPTzSAoXIpa-eicnthjzXHQlCFQRGOqfLIPUJe_oHQSatmka6v5uSyxcde_BZSy70yTvZR09IFd2QaX_jI-K3k-isMbAlYcdUuo8R1R-hsDaQYjZzobowt2fcPcAwH0q2QI0Oi-t9X5zg93Kct2C9FLbXTTjTryrDFpD3LOZJDNGlu"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-72 mt-20 p-10 space-y-12">
+<!-- Overview Section: Bento Grid Layout -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- This Month's Total Income -->
+<div class="col-span-1 md:col-span-2 relative overflow-hidden bg-primary-container/5 rounded-lg p-10 flex flex-col justify-between group border-none">
+<div class="absolute top-0 right-0 p-8 text-primary/10">
+<span class="material-symbols-outlined text-9xl">trending_up</span>
+</div>
+<div class="relative z-10">
+<p class="text-label-md text-on-surface-variant mb-4 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                        THIS MONTH'S TOTAL INCOME
+                    </p>
+<h3 class="text-display-lg text-primary tracking-tighter">₩12,450,000</h3>
+</div>
+<div class="mt-8 flex items-center gap-4 relative z-10">
+<span class="px-4 py-1.5 bg-primary text-on-primary rounded-full text-xs font-semibold">+12.5% from last month</span>
+<span class="text-on-surface-variant text-xs">Based on current billable hours</span>
+</div>
+<!-- Subtle Gradient Texture -->
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"></div>
+</div>
+<!-- Net Earnings Card -->
+<div class="bg-tertiary-container/30 rounded-lg p-10 flex flex-col justify-between border-none">
+<div>
+<p class="text-label-md text-on-tertiary-container mb-4 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                        NET EARNINGS
+                    </p>
+<h3 class="text-headline-md text-on-surface">₩9,337,500</h3>
+</div>
+<div class="mt-10 space-y-4">
+<div class="flex justify-between items-center text-sm border-b border-outline-variant/10 pb-2">
+<span class="text-on-surface-variant">Estimated Tax (25%)</span>
+<span class="font-medium text-error">₩3,112,500</span>
+</div>
+<p class="text-[11px] text-on-surface-variant leading-relaxed">
+                        Tax liabilities are estimated based on your local jurisdiction and previous filings.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Performance & Quick Actions -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Performance Chart -->
+<div class="lg:col-span-4 bg-surface-container-lowest rounded-lg p-8 h-full">
+<h4 class="text-title-lg mb-8">Fiscal Health Report</h4>
+<div class="relative flex items-center justify-center py-6">
+<!-- Circular Chart Placeholder Style -->
+<div class="relative w-48 h-48 rounded-full border-[16px] border-surface-container flex items-center justify-center">
+<div class="absolute inset-0 rounded-full border-[16px] border-primary border-t-transparent border-r-transparent transform -rotate-45"></div>
+<div class="text-center">
+<span class="text-4xl font-bold text-on-surface">75%</span>
+<p class="text-label-md text-on-surface-variant">RETAINED</p>
+</div>
+</div>
+</div>
+<div class="mt-8 space-y-4">
+<p class="text-sm text-on-surface-variant text-center">
+                        Your retention rate is <strong>Excellent</strong>. You've kept ₩7.5M for every ₩10M earned.
+                    </p>
+</div>
+</div>
+<!-- Recent Activities -->
+<div class="lg:col-span-8 bg-surface-container-lowest rounded-lg p-8">
+<div class="flex items-center justify-between mb-8">
+<h4 class="text-title-lg">Recent Activities</h4>
+<button class="text-primary text-sm font-semibold hover:underline">View All</button>
+</div>
+<div class="overflow-hidden">
+<div class="space-y-1">
+<!-- Transaction Item 1 -->
+<div class="flex items-center justify-between py-4 px-4 hover:bg-surface-container-low transition-colors rounded-lg group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-tertiary-container flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+</div>
+<div>
+<p class="font-semibold text-on-surface">UI Design - Phoenix Project</p>
+<p class="text-xs text-on-surface-variant">Today, 2:45 PM • Income</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-tertiary">+ ₩2,500,000</p>
+<p class="text-[10px] text-on-surface-variant">Cleared</p>
+</div>
+</div>
+<!-- Transaction Item 2 -->
+<div class="flex items-center justify-between py-4 px-4 hover:bg-surface-container-low transition-colors rounded-lg group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-error-container/10 flex items-center justify-center text-error">
+<span class="material-symbols-outlined">receipt</span>
+</div>
+<div>
+<p class="font-semibold text-on-surface">Adobe Creative Cloud</p>
+<p class="text-xs text-on-surface-variant">Yesterday • Subscription</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-on-surface">- ₩62,000</p>
+<p class="text-[10px] text-on-surface-variant">Tax Deductible</p>
+</div>
+</div>
+<!-- Transaction Item 3 -->
+<div class="flex items-center justify-between py-4 px-4 hover:bg-surface-container-low transition-colors rounded-lg group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-tertiary-container flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+</div>
+<div>
+<p class="font-semibold text-on-surface">Frontend Consulting</p>
+<p class="text-xs text-on-surface-variant">24 Oct 2023 • Income</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-tertiary">+ ₩1,800,000</p>
+<p class="text-[10px] text-on-surface-variant">Cleared</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Floating Action Area -->
+<section class="flex justify-center py-10">
+<button class="bg-primary text-on-primary px-10 py-5 rounded-full flex items-center gap-3 shadow-lg shadow-primary/20 hover:scale-105 transition-transform duration-300 group">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="text-base font-semibold">Add New Transaction</span>
+</button>
+</section>
+</main>
+<!-- Background Decorative Elements -->
+<div class="fixed top-0 right-0 -z-10 w-1/3 h-1/2 bg-gradient-to-bl from-primary-container/10 to-transparent rounded-full blur-3xl opacity-40 translate-x-1/4 -translate-y-1/4"></div>
+<div class="fixed bottom-0 left-72 -z-10 w-1/4 h-1/3 bg-gradient-to-tr from-tertiary-container/20 to-transparent rounded-full blur-3xl opacity-30 -translate-x-1/4 translate-y-1/4"></div>
+</body></html>

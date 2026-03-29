@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx -y serve --help)",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}
